@@ -150,6 +150,7 @@ program
   .description('Add an icon from Iconify (collection:name) and generate framework component')
   .option('-f, --framework <fw>', 'Override framework (react/vue/angular/laravel)')
   .option('--raw', 'Save raw cleaned SVG instead of framework component')
+  .option('--both', 'Save cleaned SVG alongside framework component')
   .option('--force', 'Overwrite existing file if present')
   .action(async (iconId, opts) => {
     const spinner = ora(`Fetching ${iconId}...`).start();
@@ -167,7 +168,8 @@ program
         process.exitCode = 1;
         return;
       }
-      const framework = (opts.framework || config.framework || 'unknown').toLowerCase();
+  // Autodetect/override framework
+  const framework = (opts.framework || config.framework || 'unknown').toLowerCase();
       const targetDir = path.resolve(process.cwd(), config.iconPath);
       await fs.ensureDir(targetDir);
 
@@ -208,7 +210,7 @@ program
       spinner.text = `Generating ${framework} component...`;
       let code; let filename;
       const useTS = !!config.typescript;
-      if (opts.raw) {
+  if (opts.raw) {
         code = rawSvg; // optionally could use processed.children only
         filename = kebab + '.svg';
       } else {
@@ -239,7 +241,7 @@ program
         }
       }
 
-      const filePath = path.join(targetDir, filename);
+  const filePath = path.join(targetDir, filename);
 
       // Duplicate check
       if (await fs.pathExists(filePath) && !opts.force) {
@@ -270,9 +272,24 @@ program
         console.log(chalk.gray('Prettier formatting skipped:'), e.message);
       }
 
+      // Write primary artifact
       await fs.writeFile(filePath, finalCode, 'utf8');
 
+      // If --both, also write cleaned SVG next to component
+      if (opts.both && !opts.raw) {
+        const svgName = kebab + '.svg';
+        const svgPath = path.join(targetDir, svgName);
+        // Avoid overwrite unless --force
+        if (!(await fs.pathExists(svgPath)) || opts.force) {
+          // Serialize cleaned SVG using processed attrs/children
+          const attrsString = Object.entries(processed.attrs).map(([k,v]) => `${k}="${v}"`).join(' ');
+          const cleaned = `<svg ${attrsString}>${processed.children}</svg>`;
+          await fs.writeFile(svgPath, cleaned, 'utf8');
+        }
+      }
+
       // Barrel export (React/Vue only)
+  // Barrel export for component frameworks only
   if (!opts.raw && ['react', 'next', 'vite-react', 'vite-vue', 'vue'].includes(framework)) {
         const indexFile = path.join(targetDir, config.typescript ? 'index.ts' : 'index.js');
         const exportLine = framework.includes('vue') || framework === 'vue' || framework === 'vite-vue'

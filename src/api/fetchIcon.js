@@ -19,6 +19,7 @@ function parseId(id) {
  * @returns {Promise<string>} raw SVG string
  */
 async function fetchIcon(id) {
+  // Offline fixture mode used by tests & integration to avoid network flakiness.
   // Offline fixture mode for integration tests
   if (process.env.RELAXICONS_OFFLINE === '1') {
     const { collection, name } = parseId(id);

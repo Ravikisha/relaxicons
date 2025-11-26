@@ -19,15 +19,17 @@ tests/                # Jest test suites
 ## Data Flow (add command)
 1. Parse `iconId` (collection:name)
 2. Load config (`icon.config.json`)
-3. Fetch raw SVG (`fetchIcon`)
-4. Transform SVG (`transformSvg`) => `{ attrs, children }`
-5. Select template based on framework
-6. Generate code & format (Prettier)
-7. Write file & update barrel export
+3. Detect framework (heuristics in `detectFramework`) unless overridden via `--framework`
+4. Fetch raw SVG (`fetchIcon`)
+5. Transform SVG (`transformSvg`) => `{ attrs, children }`
+6. Select template based on framework
+7. Generate code & format (Prettier)
+8. Write file & update barrel export
+9. If `--both` provided, also write cleaned SVG alongside the component
 
 ## Adding a New Framework
 1. Create `src/templates/<framework>.js` exporting a generator function that returns string code.
-2. Update the switch in `bin/index.js` add command to map new framework id.
+2. Update the switch in `bin/index.js` add command to map new framework id and extend `detectFramework` if needed.
 3. Add tests for template output.
 4. Document usage in README.
 
@@ -46,7 +48,7 @@ Types of tests:
 - Integration: CLI commands (init/add/list) using temp directories and mocked network requests.
 
 ### Mocking Network
-`node-fetch` is mocked in related tests by `jest.mock('node-fetch')` and returning custom objects with `status`, `ok`, and `text()` / `json()` methods.
+`node-fetch` is mocked in unit tests. Integration tests use `RELAXICONS_OFFLINE=1` to exercise offline fixtures without network.
 
 ### Error Codes / Handling
 Errors set `process.exitCode` in CLI; tests assert on exit status returned by `spawnSync`. Consider adding explicit exit codes for more conditions if needed.
@@ -63,7 +65,9 @@ Prettier is applied conditionally on generated code. Parser chosen by extension:
 - Config validation schema
 - Windows path edge case tests
 - E2E snapshot tests for generated components
-- Virtualized icon explorer in docs (already partly implemented)
+- Virtualized icon explorer in docs (already implemented)
+- Snapshot tests for `--both` outputs
+- More autodetection markers (e.g., Nuxt, Remix)
 
 ## Release Checklist
 - Update version in `package.json`

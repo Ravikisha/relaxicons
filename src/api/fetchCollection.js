@@ -6,6 +6,7 @@ const fetch = require('node-fetch');
  * @param {string} collection
  */
 async function fetchCollection(collection) {
+  // Offline fixture mode used by tests & integration to avoid network flakiness.
   // Offline fixture mode for integration tests
   if (process.env.RELAXICONS_OFFLINE === '1') {
     if (collection === 'lucide') return ['home', 'star', 'bell'];

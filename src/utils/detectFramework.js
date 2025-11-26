@@ -1,8 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
-// Detect framework based on presence of config files in project root.
+// Detect framework based on presence of config files and dependencies.
 // Returns { id, name, confidence, files: [] }
+// Heuristics:
+// - Next.js: next.config.*
+// - Vite React/Vue/Svelte: vite.config.* + dependency
+// - Angular: angular.json
+// - Laravel: composer.json + artisan
+// - Astro: astro.config.* (docs site only; we avoid choosing it for app framework)
 module.exports = function detectFramework(cwd = process.cwd()) {
   const rootFiles = new Set(fs.readdirSync(cwd));
   const has = (f) => rootFiles.has(f);
@@ -42,6 +48,11 @@ module.exports = function detectFramework(cwd = process.cwd()) {
   // Laravel
   if (has('composer.json') && has('artisan')) {
     checks.push({ id: 'laravel', name: 'Laravel', confidence: 0.9, files: ['composer.json', 'artisan'] });
+  }
+
+  // Astro (docs). We include for completeness but with lower confidence to not override app frameworks.
+  if (has('astro.config.mjs') || has('astro.config.ts') || has('astro.config.js')) {
+    checks.push({ id: 'astro', name: 'Astro', confidence: 0.5, files: ['astro.config.*'] });
   }
 
   if (!checks.length) {

@@ -23,6 +23,7 @@
 - Transform SVG for theming (remove width/height, apply `currentColor`)
 - Multi-framework templates (React, Vue, Angular, Laravel Blade)
 - Raw SVG output option
+- Autodetects your framework (Next, Vite React/Vue, Angular, Laravel)
 - Barrel export auto-maintenance
 - Pretty formatting via Prettier
 
@@ -71,6 +72,7 @@ relaxicons init --force
 |------|---------|
 | `--framework <fw>` | Override configured framework for single add |
 | `--raw` | Output optimized SVG file only |
+| `--both` | Generate both component and cleaned SVG side-by-side |
 | `--force` | Overwrite existing file or config |
 | `--filter <text>` | Filter icons when listing |
 
@@ -79,6 +81,7 @@ relaxicons init --force
 relaxicons add lucide:alarm-clock
 relaxicons add lucide:alarm-clock --framework vue
 relaxicons add lucide:alarm-clock --raw
+relaxicons add lucide:alarm-clock --both
 relaxicons list lucide --filter clock
 ```
 

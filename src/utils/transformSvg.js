@@ -6,6 +6,7 @@ const cheerio = require('cheerio');
  * - ensure stroke/fill default to currentColor if not explicitly set
  * - remove any data-* attributes that are not needed
  * - return inner markup + root tag attributes
+ * The output is consumed by framework templates and optional --both SVG write.
  */
 function transformSvg(raw) {
   const $ = cheerio.load(raw, { xmlMode: true });

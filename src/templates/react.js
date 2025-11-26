@@ -1,6 +1,7 @@
 const { toPascalCase } = require('../utils/naming');
 
 // Convert kebab-case attributes to camelCase for JSX, plus special cases
+// Example: fill-rule => fillRule; stroke-width => strokeWidth; class => className
 function jsxAttrName(name) {
   if (name === 'class') return 'className';
   return name.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
