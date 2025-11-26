@@ -37,6 +37,33 @@ describe('CLI integration', () => {
     expect(barrel).toMatch(/export \* from '\.\/HomeIcon'/);
   });
 
+  test('duplicate add does not duplicate barrel export', () => {
+    fs.writeFileSync(path.join(tmpDir, 'icon.config.json'), JSON.stringify({ framework: 'react', iconPath: 'icons', typescript: false }));
+    let res = runCLI(['add', 'lucide:home'], tmpDir);
+    expect(res.status).toBe(0);
+    res = runCLI(['add', 'lucide:home'], tmpDir);
+    // second run should exit with code 0 (no crash) or 0? It currently sets no exitCode but returns 0 unless error; allow 0
+    expect([0,1]).toContain(res.status); // status 1 if file exists message triggers process.exitCode
+    const barrelPath = path.join(tmpDir, 'icons', 'index.js');
+    if (fs.existsSync(barrelPath)) {
+      const barrel = fs.readFileSync(barrelPath, 'utf8');
+      const occurrences = (barrel.match(/export \* from '\.\/HomeIcon'/g) || []).length;
+      expect(occurrences).toBe(1);
+    }
+  });
+
+  test('raw mode does not create barrel export', () => {
+    fs.writeFileSync(path.join(tmpDir, 'icon.config.json'), JSON.stringify({ framework: 'react', iconPath: 'icons', typescript: false }));
+    const res = runCLI(['add', 'lucide:home', '--raw'], tmpDir);
+    expect(res.status).toBe(0);
+    const iconDir = path.join(tmpDir, 'icons');
+    const files = fs.existsSync(iconDir) ? fs.readdirSync(iconDir) : [];
+    // raw file should be kebab-case svg
+    expect(files.some(f => f === 'home.svg')).toBe(true);
+    // no index.js barrel file
+    expect(files.some(f => /index\.(js|ts)$/.test(f))).toBe(false);
+  });
+
   test('list prints icons', () => {
     const res = runCLI(['list', 'lucide'], tmpDir);
     expect(res.stdout).toMatch(/home/);

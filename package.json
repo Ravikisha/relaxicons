@@ -1,17 +1,40 @@
 {
   "name": "relaxicons",
   "version": "1.0.0",
-  "description": "CLI to fetch Iconify icons and generate framework components (React/Vue/Angular/Laravel)",
-  "main": "index.js",
+  "description": "Relaxicons CLI: fetch Iconify icons and instantly generate themed React, Vue, Angular, and Laravel components with auto barrel exports and SVG normalization.",
+  "main": "bin/index.js",
   "scripts": {
     "test": "jest",
     "coverage": "jest --coverage"
   },
-  "keywords": ["icons","cli","react","vue","angular","laravel","svg","iconify"],
-  "author": "",
+  "keywords": [
+    "icons","icon","svg","iconify","component","react","vue","angular","laravel","blade","astro","starlight","design-system","ui","cli","generator"
+  ],
+  "author": "Relaxicons Contributors <maintainers@relaxicons.dev>",
   "license": "ISC",
   "type": "commonjs",
-  "bin": "./bin/index.js",
+  "bin": {
+    "relaxicons": "./bin/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/relaxicons/relaxicons.git"
+  },
+  "homepage": "https://relaxicons.github.io/relaxicons",
+  "bugs": {
+    "url": "https://github.com/relaxicons/relaxicons/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin/","src/","icons/","README.md","LICENSE","DEV_GUIDE.md","logo.png"
+  ],
+  "sideEffects": false,
+  "preferGlobal": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "chalk": "^5.6.2",
     "cheerio": "^1.1.2",

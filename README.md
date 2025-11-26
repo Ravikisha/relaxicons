@@ -1,13 +1,19 @@
 # Relaxicons
 
+<p align="center">
+  <img src="./logo.png" alt="Relaxicons logo" width="160" />
+</p>
+
 > Fetch any Iconify icon and generate ready-to-use components for React, Vue, Angular, and Laravel.
 
 <div align="center">
 
 [![npm version](https://img.shields.io/npm/v/relaxicons.svg?style=flat&color=blue)](https://www.npmjs.com/package/relaxicons)
+[![CI](https://github.com/relaxicons/relaxicons/actions/workflows/ci.yml/badge.svg)](https://github.com/relaxicons/relaxicons/actions)
+[![Codecov](https://codecov.io/gh/relaxicons/relaxicons/branch/main/graph/badge.svg)](https://codecov.io/gh/relaxicons/relaxicons)
+[![Docs](https://img.shields.io/badge/docs-online-purple.svg)](https://relaxicons.github.io/relaxicons)
 [![License](https://img.shields.io/badge/license-ISC-green.svg)](#license)
 [![Node](https://img.shields.io/badge/node-%3E=18.0.0-forest.svg)](https://nodejs.org)
-[![Coverage](https://img.shields.io/badge/coverage-Jest-blueviolet.svg)](#testing)
 
 </div>
 
@@ -19,6 +25,9 @@
 - Raw SVG output option
 - Barrel export auto-maintenance
 - Pretty formatting via Prettier
+
+## Documentation
+Full docs & guides: https://relaxicons.github.io/relaxicons
 
 ## Install
 ```bash
