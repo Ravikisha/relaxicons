@@ -1,0 +1,34 @@
+---
+const { value, label = "Copy" } = Astro.props;
+---
+
+<button class="copy-btn" data-value={value}>{label}</button>
+<script>
+  const script = document.currentScript;
+  const btn = script?.previousElementSibling;
+  if (!(btn instanceof HTMLElement)) {
+    // no related button found, nothing to do
+  } else {
+    btn.addEventListener("click", () => {
+      const val = btn.getAttribute("data-value");
+      navigator.clipboard.writeText(val || "").then(() => {
+        const original = btn.textContent;
+        btn.textContent = "Copied";
+        setTimeout(() => (btn.textContent = original), 1500);
+      });
+    });
+  }
+</script>
+<style>
+  .copy-btn {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--sl-color-accent);
+    background: var(--sl-color-accent-low);
+    border-radius: 0.4rem;
+    cursor: pointer;
+  }
+  .copy-btn:hover {
+    background: var(--sl-color-accent);
+    color: var(--sl-color-text-invert);
+  }
+</style>

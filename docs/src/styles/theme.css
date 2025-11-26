@@ -1,0 +1,39 @@
+/* Relaxicons Docs Theme */
+:root {
+	--rlx-radius-sm: .35rem;
+	--rlx-radius: .55rem;
+	--rlx-gradient: linear-gradient(135deg,var(--sl-color-accent-low),var(--sl-color-bg));
+}
+
+body {
+	background: var(--sl-color-bg);
+	font-feature-settings: "cv02","cv03","cv04";
+}
+
+.copy-btn {
+	background: var(--sl-color-accent);
+	border: 1px solid var(--sl-color-accent);
+	color: var(--sl-color-text-invert);
+	padding: .5rem .75rem;
+	border-radius: var(--rlx-radius-sm);
+	font-size: .8rem;
+	cursor: pointer;
+	transition: background .15s, transform .15s;
+}
+.copy-btn:hover { background: var(--sl-color-accent-high); transform: translateY(-2px); }
+
+.icon-explorer-controls { backdrop-filter: blur(6px); }
+
+/* Typography tweaks */
+h1,h2,h3 { letter-spacing:.5px; }
+code { font-size: .8rem; }
+
+/* Utilities */
+.rlx-flex { display:flex; }
+.rlx-center { display:flex; align-items:center; justify-content:center; }
+.rlx-grid { display:grid; gap:1rem; }
+
+/* Card base */
+.rlx-card { background: var(--rlx-gradient); border:1px solid var(--sl-color-accent-low); border-radius: var(--rlx-radius); padding:1rem; }
+.rlx-card:hover { box-shadow:0 4px 12px rgba(0,0,0,.08); }
+

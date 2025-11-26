@@ -1,0 +1,56 @@
+---
+title: Relaxicons
+description: Fetch, transform, and generate icon components effortlessly.
+slug: /
+hero:
+  tagline: Generate framework-ready icon components from Iconify IDs.
+  image:
+    file: ../../../public/logo.png
+  actions:
+    - text: Get Started
+      link: /getting-started/
+    - text: CLI Reference
+      link: /cli/
+    - text: Icon Explorer
+      link: /icon-explorer/
+---
+
+import CopyButton from '../../components/CopyButton.astro';
+
+# Relaxicons
+
+Relaxicons is a CLI that turns any Iconify icon (e.g. `lucide:home`) into a polished component for React, Vue, Angular, or Laravel.
+
+```bash
+npm install -g relaxicons
+relaxicons init
+relaxicons add lucide:home
+```
+
+<CopyButton value="relaxicons add lucide:star" label="Copy Example" />
+
+## Features
+
+- Fetch & suggest icons from collections
+- Transform SVG (strip dimensions, set `currentColor`)
+- Output multi-framework components
+- Auto formatting & barrel export updates
+- Fuzzy suggestions & list filtering
+
+## Quick Links
+
+- [Getting Started](/getting-started/)
+- [CLI Reference](/cli/)
+- [Icon Explorer](/icon-explorer/)
+- [Configuration](/configuration/)
+- [Transform Pipeline](/transform/)
+- [Framework Adapters](/framework-adapters/)
+- [FAQ](/faq/)
+
+## Why Relaxicons?
+
+Manually copying SVGs into components is repetitive. Relaxicons standardizes attributes, injects accessibility-friendly defaults, and keeps your icon library organized. Focus on building—let the tooling handle boilerplate.
+
+## Next Steps
+
+Head to [Getting Started](/getting-started/) to create your `icon.config.json` and add your first icon.

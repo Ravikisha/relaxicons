@@ -1,0 +1,386 @@
+---
+interface Props {
+  // Define which collections you want to offer
+  collections?: string[];
+  defaultCollection?: string;
+}
+
+const { 
+  collections = ['lucide', 'heroicons', 'radix-icons', 'tabler', 'mdi', 'carbon', 'ph', 'solar', 'uim'], 
+  defaultCollection = 'lucide' 
+} = Astro.props;
+---
+
+<div class="icon-lib-container">
+  <div class="controls-header">
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="il-search" type="text" placeholder="Search icon name..." autocomplete="off" />
+      <div id="il-count" class="badge">0 icons</div>
+    </div>
+
+    <div class="category-rail" role="tablist">
+      {collections.map(c => (
+        <button 
+          class:list={['cat-chip', { active: c === defaultCollection }]} 
+          data-collection={c}
+          role="tab"
+          aria-selected={c === defaultCollection}
+        >
+          {c}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div id="il-grid" class="icon-grid"></div>
+
+  <div id="il-loader" class="loader">
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<style>
+  /* --- Starlight Theme Integration --- */
+  .icon-lib-container {
+    --gap: 1rem;
+    --radius: 0.5rem;
+    /* Use Starlight variables */
+    --bg-surface: var(--sl-color-gray-6);
+    --border: var(--sl-color-hairline); 
+    --accent: var(--sl-color-accent);
+    --text-muted: var(--sl-color-gray-3);
+    
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  /* --- Search Bar --- */
+  .search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+    background: var(--sl-color-black); /* Starlight input bg */
+    border: 1px solid var(--border);
+    padding: 0.8rem 1rem 0.8rem 2.8rem;
+    border-radius: var(--radius);
+    color: var(--sl-color-white);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .search-box input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .badge {
+    position: absolute;
+    right: 1rem;
+    font-size: 0.75rem;
+    background: var(--bg-surface);
+    color: var(--text-muted);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* --- Category Rail --- */
+  .category-rail {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    mask-image: linear-gradient(to right, black 90%, transparent 100%);
+  }
+
+  .cat-chip {
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--sl-color-gray-2);
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+
+  .cat-chip:hover {
+    border-color: var(--sl-color-gray-3);
+    background: var(--sl-color-gray-6);
+  }
+
+  .cat-chip.active {
+    background: var(--accent);
+    color: var(--sl-color-white);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* --- Grid & Cards --- */
+  .icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Dense modern grid */
+    gap: 0.75rem;
+    min-height: 300px;
+  }
+
+  /* Generated dynamically via JS, referencing global styles here for clarity */
+  :global(.il-card) {
+    background: var(--sl-color-white);
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+  }
+
+  :global(.il-card:hover) {
+    background: var(--sl-color-gray-5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  :global(.il-card img) {
+    width: 28px;
+    height: 28px;
+    filter: grayscale(100%) opacity(0.8); /* Starlight-style muted */
+    transition: all 0.2s;
+  }
+
+  :global(.il-card:hover img) {
+    filter: none;
+    transform: scale(1.1);
+  }
+
+  :global(.il-name) {
+    font-size: 0.7rem;
+    color: var(--sl-color-gray-3);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+
+  /* Light mode adjustments */
+  @media (prefers-color-scheme: light) {
+      :global(.il-card) { background: var(--sl-color-white); }
+      :global(.il-card img) { filter: grayscale(40%) opacity(.85); color: #fff; }
+      :global(.il-name) { color: var(--sl-color-gray-4); }
+      :global(.il-card:hover img) { filter:none; }
+
+    }
+    
+    /* Dark mode: force white icon & label for contrast */
+    @media (prefers-color-scheme: dark) {
+    :global(.il-card) { background: var(--sl-color-white); }
+    :global(.il-card img) { filter:none; color:#fff; }
+    :global(.il-name) { color: #222; }
+    :global(.il-card:hover) { background: var(--sl-color-gray-2);}
+  }
+
+  /* --- Loader --- */
+  .loader {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .loader.active { opacity: 1; }
+  
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Toast notification for copy */
+  :global(.il-toast) {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--accent);
+    color: white;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.2s;
+  }
+  :global(.il-card.copied .il-toast) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+
+<script>
+  // @ts-nocheck
+  class IconLibrary {
+    constructor() {
+      // DOM Elements
+      this.grid = document.getElementById('il-grid');
+      this.loader = document.getElementById('il-loader');
+      this.input = document.getElementById('il-search');
+      this.countBadge = document.getElementById('il-count');
+      this.chips = document.querySelectorAll('.cat-chip');
+
+      // State
+      this.activeCollection = document.querySelector('.cat-chip.active')?.dataset.collection || 'lucide';
+      this.icons = []; // Full list
+      this.visibleIcons = []; // Filtered list
+      this.renderCount = 0;
+      this.BATCH_SIZE = 60;
+      this.timeout = null;
+
+      this.init();
+    }
+
+    init() {
+      // Listeners
+      this.input.addEventListener('input', () => this.handleSearch());
+      
+      this.chips.forEach(chip => {
+        chip.addEventListener('click', (e) => this.switchCollection(e.target));
+      });
+
+      // Infinite Scroll
+      this.observer = new IntersectionObserver((entries) => {
+        if(entries[0].isIntersecting) this.renderNextBatch();
+      }, { rootMargin: '200px' });
+      
+      this.observer.observe(this.loader);
+
+      // Initial Load
+      this.loadCollection(this.activeCollection);
+    }
+
+    async switchCollection(targetBtn) {
+      // UI Toggle
+      this.chips.forEach(c => c.classList.remove('active'));
+      targetBtn.classList.add('active');
+      
+      // Logic
+      this.activeCollection = targetBtn.dataset.collection;
+      this.input.value = ''; // Reset search
+      await this.loadCollection(this.activeCollection);
+    }
+
+    async loadCollection(prefix) {
+      this.loader.classList.add('active');
+      this.grid.innerHTML = '';
+      this.countBadge.innerText = 'Loading...';
+      
+      try {
+        const res = await fetch(`https://api.iconify.design/collection?prefix=${prefix}`);
+        const data = await res.json();
+        
+        // Handle different API responses structure
+        this.icons = data.uncategorized || Object.keys(data.icons || {});
+        if (!this.icons.length && data.categories) {
+           this.icons = Object.values(data.categories).flat();
+        }
+
+        this.visibleIcons = this.icons;
+        this.renderCount = 0;
+        this.renderNextBatch();
+        this.updateCount();
+      } catch (err) {
+        this.grid.innerHTML = '<div style="color:var(--sl-color-red)">Failed to load icons.</div>';
+      } finally {
+        this.loader.classList.remove('active');
+      }
+    }
+
+    handleSearch() {
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        const query = this.input.value.toLowerCase().trim();
+        
+        if (!query) {
+          this.visibleIcons = this.icons;
+        } else {
+          this.visibleIcons = this.icons.filter(name => name.includes(query));
+        }
+        
+        this.renderCount = 0;
+        this.grid.innerHTML = '';
+        this.renderNextBatch();
+        this.updateCount();
+      }, 300);
+    }
+
+    renderNextBatch() {
+      const batch = this.visibleIcons.slice(this.renderCount, this.renderCount + this.BATCH_SIZE);
+      if (batch.length === 0) return;
+
+      const frag = document.createDocumentFragment();
+
+      batch.forEach(name => {
+        const card = document.createElement('div');
+        card.className = 'il-card';
+        card.setAttribute('role', 'button');
+        card.title = `Click to copy: ${name}`;
+        
+        // Command to copy
+        const cmd = `relaxicons add ${this.activeCollection}:${name}`;
+
+        card.innerHTML = `
+          <div class="il-toast">Copied</div>
+          <img src="https://api.iconify.design/${this.activeCollection}/${name}.svg" loading="lazy" style="width:32px;height:32px;" />
+          <span class="il-name">${name}</span>
+        `;
+
+        // Click to Copy Logic
+        card.addEventListener('click', () => {
+          navigator.clipboard.writeText(cmd);
+          card.classList.add('copied');
+          setTimeout(() => card.classList.remove('copied'), 1500);
+        });
+
+        frag.appendChild(card);
+      });
+
+      this.grid.appendChild(frag);
+      this.renderCount += batch.length;
+    }
+
+    updateCount() {
+      this.countBadge.innerText = `${this.visibleIcons.length} icons`;
+    }
+  }
+
+  // Initialize
+  new IconLibrary();
+</script>
