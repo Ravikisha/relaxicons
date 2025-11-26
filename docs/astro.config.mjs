@@ -21,7 +21,7 @@ export default defineConfig({
         {
           icon: "github",
           label: "GitHub",
-          href: "https://github.com/relaxicons/relaxicons",
+          href: "https://github.com/Ravikisha/relaxicons",
         },
       ],
       sidebar: [

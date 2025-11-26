@@ -10,7 +10,7 @@
   "keywords": [
     "icons","icon","svg","iconify","component","react","vue","angular","laravel","blade","astro","starlight","design-system","ui","cli","generator"
   ],
-  "author": "Relaxicons Contributors <maintainers@relaxicons.dev>",
+  "author": "Relaxicons Contributors <ravikishan63392@gmail.com>",
   "license": "ISC",
   "type": "commonjs",
   "bin": {
@@ -18,11 +18,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/relaxicons/relaxicons.git"
+    "url": "git+https://github.com/Ravikisha/relaxicons.git"
   },
   "homepage": "https://relaxicons.github.io/relaxicons",
   "bugs": {
-    "url": "https://github.com/relaxicons/relaxicons/issues"
+    "url": "https://github.com/Ravikisha/relaxicons/issues"
   },
   "engines": {
     "node": ">=18"
