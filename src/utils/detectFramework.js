@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 // Detect framework based on presence of config files and dependencies.
 // Returns { id, name, confidence, files: [] }
@@ -15,24 +15,53 @@ module.exports = function detectFramework(cwd = process.cwd()) {
   const checks = [];
 
   // Next.js
-  if (has('next.config.js') || has('next.config.mjs') || has('next.config.ts')) {
-    checks.push({ id: 'next', name: 'Next.js', confidence: 0.9, files: ['next.config.*'] });
+  if (
+    has("next.config.js") ||
+    has("next.config.mjs") ||
+    has("next.config.ts")
+  ) {
+    checks.push({
+      id: "next",
+      name: "Next.js",
+      confidence: 0.9,
+      files: ["next.config.*"],
+    });
   }
 
   // Vite-based frameworks (React/Vue/Svelte) indicated by vite.config.* and package.json deps
-  if ([...rootFiles].some(f => /^vite\.config\.(js|mjs|ts|cjs)$/.test(f)) && has('package.json')) {
+  if (
+    [...rootFiles].some((f) => /^vite\.config\.(js|mjs|ts|cjs)$/.test(f)) &&
+    has("package.json")
+  ) {
     try {
-      const pkg = JSON.parse(fs.readFileSync(path.join(cwd, 'package.json'), 'utf8'));
+      const pkg = JSON.parse(
+        fs.readFileSync(path.join(cwd, "package.json"), "utf8")
+      );
       const deps = { ...pkg.dependencies, ...pkg.devDependencies };
       if (deps) {
         if (deps.react) {
-          checks.push({ id: 'vite-react', name: 'Vite (React)', confidence: 0.8, files: ['vite.config.*', 'react dependency'] });
+          checks.push({
+            id: "vite-react",
+            name: "Vite (React)",
+            confidence: 0.8,
+            files: ["vite.config.*", "react dependency"],
+          });
         }
         if (deps.vue) {
-          checks.push({ id: 'vite-vue', name: 'Vite (Vue)', confidence: 0.8, files: ['vite.config.*', 'vue dependency'] });
+          checks.push({
+            id: "vite-vue",
+            name: "Vite (Vue)",
+            confidence: 0.8,
+            files: ["vite.config.*", "vue dependency"],
+          });
         }
         if (deps.svelte) {
-          checks.push({ id: 'vite-svelte', name: 'Vite (Svelte)', confidence: 0.8, files: ['vite.config.*', 'svelte dependency'] });
+          checks.push({
+            id: "vite-svelte",
+            name: "Vite (Svelte)",
+            confidence: 0.8,
+            files: ["vite.config.*", "svelte dependency"],
+          });
         }
       }
     } catch (e) {
@@ -41,22 +70,41 @@ module.exports = function detectFramework(cwd = process.cwd()) {
   }
 
   // Angular
-  if (has('angular.json')) {
-    checks.push({ id: 'angular', name: 'Angular', confidence: 0.85, files: ['angular.json'] });
+  if (has("angular.json")) {
+    checks.push({
+      id: "angular",
+      name: "Angular",
+      confidence: 0.85,
+      files: ["angular.json"],
+    });
   }
 
   // Laravel
-  if (has('composer.json') && has('artisan')) {
-    checks.push({ id: 'laravel', name: 'Laravel', confidence: 0.9, files: ['composer.json', 'artisan'] });
+  if (has("composer.json") && has("artisan")) {
+    checks.push({
+      id: "laravel",
+      name: "Laravel",
+      confidence: 0.9,
+      files: ["composer.json", "artisan"],
+    });
   }
 
   // Astro (docs). We include for completeness but with lower confidence to not override app frameworks.
-  if (has('astro.config.mjs') || has('astro.config.ts') || has('astro.config.js')) {
-    checks.push({ id: 'astro', name: 'Astro', confidence: 0.5, files: ['astro.config.*'] });
+  if (
+    has("astro.config.mjs") ||
+    has("astro.config.ts") ||
+    has("astro.config.js")
+  ) {
+    checks.push({
+      id: "astro",
+      name: "Astro",
+      confidence: 0.5,
+      files: ["astro.config.*"],
+    });
   }
 
   if (!checks.length) {
-    return { id: 'unknown', name: 'Unknown', confidence: 0, files: [] };
+    return { id: "unknown", name: "Unknown", confidence: 0, files: [] };
   }
 
   // Choose highest confidence; if tie choose first.

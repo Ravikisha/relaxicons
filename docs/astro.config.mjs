@@ -5,6 +5,8 @@ import starlight from "@astrojs/starlight";
 // https://astro.build/config
 
 export default defineConfig({
+  site: 'https://ravikisha.github.io',
+  base: '/relaxicons',
   integrations: [
     starlight({
       title: "Relaxicons",

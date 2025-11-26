@@ -28,7 +28,6 @@ program
   .version(pkg.version);
 
 // INIT COMMAND
-// INIT COMMAND
 program
   .command('init')
   .description('Initialize relaxicons configuration (creates icon.config.json)')
