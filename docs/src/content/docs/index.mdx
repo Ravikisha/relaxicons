@@ -15,7 +15,7 @@ hero:
       link: /relaxicons/icon-explorer/
 ---
 
-import CopyButton from '../../components/CopyButton.astro';
+import CopyButton from "../../components/CopyButton.astro";
 
 # Relaxicons
 
@@ -40,14 +40,49 @@ relaxicons add lucide:home
 
 ## Frameworks
 
-<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:'16px',alignItems:'center'}}>
-  <img src={`${import.meta.env.BASE_URL}frameworks/react.svg`} alt="React" width="120" />
-  <img src={`${import.meta.env.BASE_URL}frameworks/vue.svg`} alt="Vue" width="120" />
-  <img src={`${import.meta.env.BASE_URL}frameworks/angular.svg`} alt="Angular" width="120" />
-  <img src={`${import.meta.env.BASE_URL}frameworks/svelte.svg`} alt="Svelte" width="120" />
-  <img src={`${import.meta.env.BASE_URL}frameworks/solid.svg`} alt="Solid" width="120" />
-  <img src={`${import.meta.env.BASE_URL}frameworks/webc.svg`} alt="Web Components" width="120" />
-  <img src={`${import.meta.env.BASE_URL}frameworks/next.svg`} alt="Next.js" width="120" />
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))",
+    gap: "16px",
+    alignItems: "center",
+  }}
+>
+  <img
+    src={`${import.meta.env.BASE_URL}frameworks/react.svg`}
+    alt="React"
+    width="120"
+  />
+  <img
+    src={`${import.meta.env.BASE_URL}frameworks/vue.svg`}
+    alt="Vue"
+    width="120"
+  />
+  <img
+    src={`${import.meta.env.BASE_URL}frameworks/angular.svg`}
+    alt="Angular"
+    width="120"
+  />
+  <img
+    src={`${import.meta.env.BASE_URL}frameworks/svelte.svg`}
+    alt="Svelte"
+    width="120"
+  />
+  <img
+    src={`${import.meta.env.BASE_URL}frameworks/solid.svg`}
+    alt="Solid"
+    width="120"
+  />
+  <img
+    src={`${import.meta.env.BASE_URL}frameworks/webc.svg`}
+    alt="Web Components"
+    width="120"
+  />
+  <img
+    src={`${import.meta.env.BASE_URL}frameworks/next.svg`}
+    alt="Next.js"
+    width="120"
+  />
 </div>
 
 ## Quick Links
@@ -56,20 +91,22 @@ relaxicons add lucide:home
 - [CLI Reference](/relaxicons/cli/)
 - [Collections](/relaxicons/collections/)
 - [Icon Explorer](/relaxicons/icon-explorer/)
-- [Compare Collections](/relaxicons/compare-collections/)
 - [Configuration](/relaxicons/configuration/)
 - [Transform Pipeline](/relaxicons/transform/)
 - [Framework Adapters](/relaxicons/framework-adapters/)
 - [FAQ](/relaxicons/faq/)
 
 ## Why Relaxicons?
+
 ### New in the Explorer
+
 - Favorites & Recent tabs
 - Keyboard shortcuts (arrows + Enter)
 - Export selection and copy variants (CMD/SVG/DATA)
 - Per-collection stats and a top-icons carousel
 
 ### CLI additions
+
 - `relaxicons stats` — counts per collection (supports `-c`)
 - `relaxicons doctor --verbose` — diagnostics
 - `relaxicons cache-clear` — placeholder
