@@ -10,14 +10,14 @@ function withTemp(cb) {
 describe('getConfig', () => {
   test('throws NO_CONFIG when file absent', () => {
     withTemp((dir) => {
-      expect(() => getConfig(dir)).toThrow(/icon.config.json/);
+      expect(() => getConfig(dir)).toThrow(/relaxicons.config.json/);
       try { getConfig(dir); } catch (e) { expect(e.code).toBe('NO_CONFIG'); }
     });
   });
 
   test('reads and parses JSON file', () => {
     withTemp((dir) => {
-      const file = path.join(dir, 'icon.config.json');
+      const file = path.join(dir, 'relaxicons.config.json');
       fs.writeFileSync(file, JSON.stringify({ framework: 'react', iconPath: 'icons', typescript: true }));
       const cfg = getConfig(dir);
       expect(cfg.framework).toBe('react');
@@ -28,7 +28,7 @@ describe('getConfig', () => {
 
   test('throws BAD_CONFIG on invalid JSON', () => {
     withTemp((dir) => {
-      const file = path.join(dir, 'icon.config.json');
+      const file = path.join(dir, 'relaxicons.config.json');
       fs.writeFileSync(file, '{ bad json');
       try { getConfig(dir); } catch (e) { expect(e.code).toBe('BAD_CONFIG'); }
     });

@@ -9,14 +9,13 @@ function angularTemplate(iconName, svg) {
     .map(([k, v]) => `${k}="${v}"`)
     .join(" ");
   return (
-    `import { Component } from '@angular/core';\n\n@Component({\n  selector: '${selector}',\n  standalone: true,\n  template: \
-` +
+    `import { Component, Input } from '@angular/core';\n\n@Component({\n  selector: '${selector}',\n  standalone: true,\n  template: ` +
     "`<svg " +
     attrString +
-    '><span style="display:none"></span>' +
+    " [attr.width]=\"size\" [attr.height]=\"size\" [attr.fill]=\"color\" [attr.stroke-width]=\"strokeWidth\" [attr.class]=\"className\">" +
     svg.children.replace(/`/g, "\`") +
     "</svg>`" +
-    `\n})\nexport class ${componentName} {}\n`
+    `\n})\nexport class ${componentName} {\n  @Input() size: string | number = '1em';\n  @Input() color: string = 'currentColor';\n  @Input() strokeWidth?: number | string;\n  @Input() className?: string;\n}\n`
   );
 }
 

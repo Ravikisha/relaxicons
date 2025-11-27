@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const { getJSONWithCache } = require('../utils/cache');
 
 /**
  * Fetch icon collection metadata from Iconify.
@@ -12,13 +13,9 @@ async function fetchCollection(collection) {
     if (collection === 'lucide') return ['home', 'star', 'bell'];
     throw new Error(`Collection not found: ${collection}`);
   }
-  const url = `https://api.iconify.design/collections`; // get all collections? Better to use https://api.iconify.design/collection?prefix={collection}
   // Iconify offers https://api.iconify.design/collection?prefix=<prefix>
   const detailUrl = `https://api.iconify.design/collection?prefix=${encodeURIComponent(collection)}`;
-  const res = await fetch(detailUrl, { headers: { 'User-Agent': 'relaxicons-cli/1.0' } });
-  if (res.status === 404) throw new Error(`Collection not found: ${collection}`);
-  if (!res.ok) throw new Error(`Failed to fetch collection (${res.status} ${res.statusText})`);
-  const json = await res.json();
+  const json = await getJSONWithCache({ url: detailUrl, key: `collection-${collection}.json` });
   if (json.icons && typeof json.icons === 'object') {
     return Object.keys(json.icons);
   }

@@ -23,8 +23,10 @@ async function fetchIcon(id) {
   // Offline fixture mode for integration tests
   if (process.env.RELAXICONS_OFFLINE === '1') {
     const { collection, name } = parseId(id);
-    if (collection === 'lucide' && name === 'home') {
-      return '<svg viewBox="0 0 10 10"><path d="M0"/></svg>';
+    if (collection === 'lucide') {
+      if (['home','star','bell'].includes(name)) {
+        return '<svg viewBox="0 0 10 10"><path d="M0"/></svg>';
+      }
     }
     throw new Error(`Icon not found: ${collection}:${name}`);
   }

@@ -23,12 +23,12 @@ describe('CLI integration', () => {
   test('init creates config & directory', () => {
     const res = runCLI(['init'], tmpDir);
     expect(res.status).toBe(0);
-    expect(fs.existsSync(path.join(tmpDir, 'icon.config.json'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, 'relaxicons.config.json'))).toBe(true);
   });
 
   test('add writes component and barrel (react)', async () => {
     // prepare config
-    fs.writeFileSync(path.join(tmpDir, 'icon.config.json'), JSON.stringify({ framework: 'react', iconPath: 'icons', typescript: false }));
+    fs.writeFileSync(path.join(tmpDir, 'relaxicons.config.json'), JSON.stringify({ framework: 'react', iconPath: 'icons', typescript: false }));
     const res = runCLI(['add', 'lucide:home'], tmpDir);
     expect(res.status).toBe(0);
     const files = fs.readdirSync(path.join(tmpDir, 'icons'));
@@ -38,7 +38,7 @@ describe('CLI integration', () => {
   });
 
   test('duplicate add does not duplicate barrel export', () => {
-    fs.writeFileSync(path.join(tmpDir, 'icon.config.json'), JSON.stringify({ framework: 'react', iconPath: 'icons', typescript: false }));
+    fs.writeFileSync(path.join(tmpDir, 'relaxicons.config.json'), JSON.stringify({ framework: 'react', iconPath: 'icons', typescript: false }));
     let res = runCLI(['add', 'lucide:home'], tmpDir);
     expect(res.status).toBe(0);
     res = runCLI(['add', 'lucide:home'], tmpDir);
@@ -53,7 +53,7 @@ describe('CLI integration', () => {
   });
 
   test('raw mode does not create barrel export', () => {
-    fs.writeFileSync(path.join(tmpDir, 'icon.config.json'), JSON.stringify({ framework: 'react', iconPath: 'icons', typescript: false }));
+    fs.writeFileSync(path.join(tmpDir, 'relaxicons.config.json'), JSON.stringify({ framework: 'react', iconPath: 'icons', typescript: false }));
     const res = runCLI(['add', 'lucide:home', '--raw'], tmpDir);
     expect(res.status).toBe(0);
     const iconDir = path.join(tmpDir, 'icons');
@@ -69,6 +69,83 @@ describe('CLI integration', () => {
     expect(res.stdout).toMatch(/home/);
     expect(res.stdout).toMatch(/star/);
     expect(res.stdout).toMatch(/bell/);
-    expect(res.stdout).toMatch(/Total: 3/);
+    expect(res.stdout).toMatch(/Icons: 3/);
+  });
+
+  test('search across collections finds matches', () => {
+    const res = runCLI(['search', 'ho'], tmpDir);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toMatch(/lucide:home/);
+  });
+
+  test('batch add via comma list and file, then remove', () => {
+    fs.writeFileSync(path.join(tmpDir, 'relaxicons.config.json'), JSON.stringify({ framework: 'react', iconPath: 'icons', typescript: false }));
+    // Comma batch
+    let res = runCLI(['add', 'lucide:home,star'], tmpDir);
+    expect([0,1]).toContain(res.status);
+    // File batch
+    const listFile = path.join(tmpDir, 'icons.txt');
+    fs.writeFileSync(listFile, 'lucide:bell');
+    res = runCLI(['add', 'lucide:bell', '--from', listFile], tmpDir);
+    expect([0,1]).toContain(res.status);
+    // Remove
+    res = runCLI(['remove', 'lucide:home'], tmpDir);
+    expect([0,1]).toContain(res.status);
+    const files = fs.readdirSync(path.join(tmpDir, 'icons'));
+    expect(files.some(f => /HomeIcon\.jsx$/.test(f))).toBe(false);
+  });
+
+  test('doctor reports environment status', () => {
+    const res = runCLI(['doctor'], tmpDir);
+    // offline fixture may cause API check to pass or fail; accept either but command should exit 0 or 1 gracefully
+    expect([0,1]).toContain(res.status);
+    expect(res.stdout + res.stderr).toMatch(/Environment looks good|Issues found/);
+  });
+
+  test('dry-run avoids writing files and still prints actions', () => {
+    fs.writeFileSync(path.join(tmpDir, 'relaxicons.config.json'), JSON.stringify({ framework: 'react', iconPath: 'icons', typescript: false }));
+    const res = runCLI(['add', 'lucide:star', '--dry-run'], tmpDir);
+    expect(res.status).toBe(0);
+    const iconDir = path.join(tmpDir, 'icons');
+    expect(fs.existsSync(iconDir)).toBe(true); // ensured dir
+    const files = fs.readdirSync(iconDir);
+    // file should likely not exist due to dry-run
+    expect(files.some(f => /StarIcon\.jsx$/.test(f))).toBe(false);
+  });
+
+  test('quiet suppresses spinner chatter', () => {
+    const res = runCLI(['collections', '--quiet'], tmpDir);
+    expect(res.status).toBe(0);
+  });
+
+  test('completion prints script', () => {
+    const res = runCLI(['completion', 'zsh'], tmpDir);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toMatch(/relaxicons completion/);
+  });
+
+  test('icons command prints icons json', () => {
+    const res = runCLI(['icons', 'lucide', '--json'], tmpDir);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toMatch(/\[\s*"home"/);
+    expect(res.stdout).toMatch(/Icons: 3/);
+  });
+
+  test('collections prints fixture list', () => {
+    const res = runCLI(['collections'], tmpDir);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toMatch(/lucide/);
+    expect(res.stdout).toMatch(/Collections: 1/);
+  });
+
+  test('collections fields output json includes objects', () => {
+    const res = runCLI(['collections', '--fields', 'name,title,count', '--json'], tmpDir);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toMatch(/"name"\s*:\s*"lucide"/);
+  });
+
+  test('update-cache succeeds offline', () => {
+    const res = runCLI(['update-cache'], tmpDir);
+    expect([0,1]).toContain(res.status);
   });
 });

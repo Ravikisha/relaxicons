@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ravikisha.github.io/relaxicons/relaxicons.config.schema.json",
+  "title": "Relaxicons Config",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "type": "integer", "minimum": 1, "default": 2 },
+    "framework": {
+      "type": "string",
+      "enum": ["react","next","next-rsc","vue","angular","laravel","svelte","solid","webc","unknown"],
+      "default": "unknown"
+    },
+    "iconPath": { "type": "string", "default": "components/ui/icons" },
+    "outDir": { "type": "string" },
+    "typescript": { "type": "boolean", "default": false },
+    "templatesDir": { "type": ["string","null"], "default": null },
+    "optimizeSvg": { "oneOf": [ {"type": "boolean"}, {"type": "object"} ], "default": true },
+    "packages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name","path","iconPath"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "path": { "type": "string" },
+          "iconPath": { "type": "string" }
+        }
+      },
+      "default": []
+    }
+  },
+  "required": ["framework","typescript"],
+  "allOf": [
+    {
+      "if": { "properties": { "outDir": {"type":"string"} } },
+      "then": { "properties": { "iconPath": {"default": {"$data":"1/outDir"}} } }
+    }
+  ]
+}

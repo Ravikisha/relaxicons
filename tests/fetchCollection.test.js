@@ -3,10 +3,20 @@ const fetch = require('node-fetch');
 jest.mock('node-fetch');
 
 function mockJson(status, json) {
-  return { status, ok: status >= 200 && status < 300, statusText: 'X', json: async () => json };
+  return { status, ok: status >= 200 && status < 300, statusText: 'X', headers: { get: () => null }, json: async () => json };
 }
 
 describe('fetchCollection', () => {
+  let oldCacheEnv; let tempCacheDir;
+  beforeEach(() => {
+    oldCacheEnv = process.env.RELAXICONS_CACHE_DIR;
+    tempCacheDir = require('fs').mkdtempSync(require('path').join(require('os').tmpdir(), 'rlx-cache-'));
+    process.env.RELAXICONS_CACHE_DIR = tempCacheDir;
+  });
+  afterEach(() => {
+    if (oldCacheEnv === undefined) delete process.env.RELAXICONS_CACHE_DIR; else process.env.RELAXICONS_CACHE_DIR = oldCacheEnv;
+    require('fs-extra').removeSync(tempCacheDir);
+  });
   test('returns icons array from API', async () => {
   fetch.mockResolvedValueOnce(mockJson(200, { icons: { home: {}, star: {}, bell: {} } }));
   const icons = await fetchCollection('lucide');
@@ -15,7 +25,7 @@ describe('fetchCollection', () => {
 
   test('throws on 404', async () => {
     fetch.mockResolvedValueOnce(mockJson(404, {}));
-    await expect(fetchCollection('bad')).rejects.toThrow(/Collection not found/);
+    await expect(fetchCollection('bad')).rejects.toThrow(/HTTP 404/);
   });
 });
 
