@@ -1,6 +1,6 @@
 {
   "name": "relaxicons",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Relaxicons CLI: fetch Iconify icons and instantly generate themed React, Vue, Angular, and Laravel components with auto barrel exports and SVG normalization.",
   "main": "bin/index.js",
   "scripts": {
@@ -8,7 +8,22 @@
     "coverage": "jest --coverage"
   },
   "keywords": [
-    "icons","icon","svg","iconify","component","react","vue","angular","laravel","blade","astro","starlight","design-system","ui","cli","generator"
+    "icons",
+    "icon",
+    "svg",
+    "iconify",
+    "component",
+    "react",
+    "vue",
+    "angular",
+    "laravel",
+    "blade",
+    "astro",
+    "starlight",
+    "design-system",
+    "ui",
+    "cli",
+    "generator"
   ],
   "author": "Relaxicons Contributors <ravikishan63392@gmail.com>",
   "license": "ISC",
@@ -28,7 +43,13 @@
     "node": ">=18"
   },
   "files": [
-    "bin/","src/","icons/","README.md","LICENSE","DEV_GUIDE.md","logo.png"
+    "bin/",
+    "src/",
+    "icons/",
+    "README.md",
+    "LICENSE",
+    "DEV_GUIDE.md",
+    "logo.png"
   ],
   "sideEffects": false,
   "preferGlobal": true,
@@ -36,7 +57,7 @@
     "access": "public"
   },
   "dependencies": {
-  "ajv": "^8.17.1",
+    "ajv": "^8.17.1",
     "chalk": "^5.6.2",
     "cheerio": "^1.1.2",
     "commander": "^14.0.2",
