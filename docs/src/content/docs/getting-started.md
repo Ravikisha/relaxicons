@@ -11,9 +11,32 @@ description: Install and initialize Relaxicons.
 npm install -g relaxicons
 ```
 
+Install your app framework if needed:
+
+```bash
+# React / Next.js
+npm i react react-dom
+npm i next   # optional, for Next.js
+
+# Vue
+npm i vue
+
+# Angular
+npm i @angular/core
+
+# Svelte
+npm i svelte
+
+# Solid
+npm i solid-js
+
+# Web Components
+# no extra install required
+```
+
 ## Initialize Config
 
-Run the init command to create `icon.config.json`.
+Run the init command to create `relaxicons.config.json`.
 
 ```bash
 relaxicons init
@@ -51,7 +74,8 @@ This will:
 List icons in a collection and narrow with a filter:
 
 ```bash
-relaxicons list --filter lucide
+relaxicons icons lucide --filter home
+relaxicons collections --filter luc
 ```
 
 If you mistype an icon name, Relaxicons shows close suggestions.

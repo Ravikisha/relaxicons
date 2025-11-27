@@ -7,22 +7,33 @@ description: How Relaxicons renders icons for each framework.
 
 Relaxicons generates idiomatic components for different ecosystems.
 
-## React
+## React (Vite / Next.js / RSC)
 - Functional component using JSX/TSX.
-- Props spread onto root `<svg>`.
+- Standard props: `size`, `color`, `strokeWidth`, `className` with defaults.
+- RSC-safe variant available via `--framework next-rsc`.
 - Named export: `HomeIcon`.
 
 ## Vue
-- Single File Component template `<template>` + `<script setup>`.
-- Accepts `v-bind` attributes when used.
+- Single File Component `<template>`.
+- Binds `$attrs` and maps `size`, `color`, `strokeWidth`, `class`/`className`.
 
 ## Angular
 - Standalone component with `@Component` decorator.
-- Selector derived from kebab-case id: `app-home-icon`.
+- `@Input()` properties: `size`, `color`, `strokeWidth`, `className`.
+- Selector derived from kebab-case id: `icon-home`.
 
 ## Laravel (Blade)
 - Blade file with PHP variables for attributes.
 - Include via `@include('icons.home')`.
+
+## Svelte
+- `.svelte` component with exported props `size`, `color`, `strokeWidth`, `className`.
+
+## Solid
+- JSX component; props include `size`, `color`, `strokeWidth`, `class` and are split/spread via `splitProps`.
+
+## Web Components
+- Custom element with Shadow DOM. Attributes: `size`, `color`, `stroke-width`, `class`.
 
 ## Raw SVG
 Use `--raw` to write optimized SVG instead of a component wrapper.
@@ -35,4 +46,4 @@ relaxicons add lucide:home --raw
 The transformer removes explicit width/height and sets fill/stroke to `currentColor` for easy theming.
 
 ## Extensibility
-Custom templates can be added by editing the template files under `src/templates/`.
+Custom templates: set `templatesDir` in `relaxicons.config.json` to point to your template directory. Supported engines: `.hbs` (Handlebars), `.ejs` (EJS), or `.js` (module exporting a function(context) => string). Files are resolved by framework id, e.g. `react.hbs`, `vue.ejs`, `angular.js`, `webc.hbs`.

@@ -1,0 +1,16 @@
+---
+title: Collections
+description: Live list of all available Iconify collections used by Relaxicons.
+---
+
+import CollectionsList from '../../components/CollectionsList.astro';
+
+# All Collections
+
+Below is a live list of all icon collections available from Iconify. You can use any of these collection prefixes with the CLI, for example: `relaxicons icons lucide` and `relaxicons add lucide:home`.
+
+<CollectionsList />
+
+Notes:
+- This list is fetched at runtime from the Iconify API. If you're offline or the API is rate-limited, the list may fail to load.
+- In that case, use the CLI: `relaxicons collections --limit 50` or `--json` to explore collections locally.

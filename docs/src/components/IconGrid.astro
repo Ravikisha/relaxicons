@@ -1,211 +1,521 @@
 ---
 interface Props {
-  // Define which collections you want to offer
+  // Define which collections you want to offer initially
   collections?: string[];
   defaultCollection?: string;
 }
 
-const { 
-  collections = ['lucide', 'heroicons', 'radix-icons', 'tabler', 'mdi', 'carbon', 'ph', 'solar', 'uim'], 
-  defaultCollection = 'lucide' 
-} = Astro.props;
+const { collections = [], defaultCollection = "lucide" } = Astro.props;
 ---
 
-<div class="icon-lib-container">
-  <div class="controls-header">
-    <div class="search-box">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="il-search" type="text" placeholder="Search icon name..." autocomplete="off" />
-      <div id="il-count" class="badge">0 icons</div>
+<div class="il-wrapper">
+  <div class="il-header">
+    <div class="search-container">
+      <svg
+        class="search-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path>
+      </svg>
+      <input
+        id="il-search"
+        type="text"
+        placeholder="Search icons..."
+        autocomplete="off"
+      />
+      <div class="actions">
+        <button id="il-export" class="text-btn" aria-label="Export selection">Export</button>
+        <button id="il-theme-toggle" class="text-btn" aria-label="Toggle theme">Toggle Theme</button>
+      </div>
+      <div id="il-count" class="count-badge">0 icons</div>
+    </div>
+  </div>
+
+  <div id="il-active-zone" class="active-zone hidden">
+    <div class="active-header">
+      <span class="label">Active Collections:</span>
+      <button id="il-clear-all" class="text-btn danger">Clear Selection</button>
+    </div>
+    <div id="il-selected" class="selected-tags" aria-live="polite"></div>
+  </div>
+
+  <div class="rail-container">
+    <div class="rail-controls">
+      <input
+        id="il-collection-filter"
+        class="mini-input"
+        type="text"
+        placeholder="Filter collections..."
+        autocomplete="off"
+      />
+      <button id="il-select-all" class="text-btn">Select Visible</button>
+      <div class="tabs" role="tablist" aria-label="Views">
+        <button id="il-tab-all" class="text-btn" role="tab" aria-selected="true">All</button>
+        <button id="il-tab-fav" class="text-btn" role="tab" aria-selected="false">Favorites</button>
+        <button id="il-tab-recent" class="text-btn" role="tab" aria-selected="false">Recent</button>
+      </div>
     </div>
 
-    <div class="category-rail" role="tablist">
-      {collections.map(c => (
-        <button 
-          class:list={['cat-chip', { active: c === defaultCollection }]} 
-          data-collection={c}
-          role="tab"
-          aria-selected={c === defaultCollection}
-        >
-          {c}
-        </button>
-      ))}
+    <div class="rail-scroll-wrapper">
+      <button id="il-prev" class="rail-arrow left" aria-label="Scroll left"
+        >‹</button
+      >
+      <div
+        id="il-rail"
+        class="category-rail"
+        role="tablist"
+        data-default={defaultCollection}
+      >
+        {
+          collections.length > 0 &&
+            collections.map((c) => (
+              <button
+                class:list={["cat-chip", { active: c === defaultCollection }]}
+                data-collection={c}
+                role="tab"
+                aria-selected={c === defaultCollection}
+              >
+                {c}
+              </button>
+            ))
+        }
+      </div>
+      <button id="il-next" class="rail-arrow right" aria-label="Scroll right"
+        >›</button
+      >
     </div>
   </div>
 
   <div id="il-grid" class="icon-grid"></div>
 
+  <div id="il-copy-aria" class="sr-only" aria-live="polite"></div>
+
   <div id="il-loader" class="loader">
     <div class="spinner"></div>
+  </div>
+  <div id="il-stats" class="stats" aria-live="polite"></div>
+  <div id="il-top" class="top-carousel" aria-label="Top icons">
+    <div class="top-track"></div>
+    <div class="top-controls">
+      <button id="il-top-prev" class="rail-arrow" aria-label="Prev">‹</button>
+      <button id="il-top-next" class="rail-arrow" aria-label="Next">›</button>
+    </div>
   </div>
 </div>
 
 <style>
-  /* --- Starlight Theme Integration --- */
-  .icon-lib-container {
-    --gap: 1rem;
-    --radius: 0.5rem;
-    /* Use Starlight variables */
-    --bg-surface: var(--sl-color-gray-6);
-    --border: var(--sl-color-hairline); 
-    --accent: var(--sl-color-accent);
-    --text-muted: var(--sl-color-gray-3);
-    
+  /* --- Variables & Reset --- */
+  .il-wrapper {
+    /* Starlight Integration Variables */
+    --il-bg: var(--sl-color-gray-6);
+    --il-bg-hover: var(--sl-color-gray-5);
+    --il-border: var(--sl-color-gray-5);
+    --il-accent: var(--sl-color-accent);
+    --il-text-main: var(--sl-color-white);
+    --il-text-muted: var(--sl-color-gray-3);
+    --il-radius: 0.5rem;
+    --il-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+    font-family: var(--sl-font-system);
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.25rem;
     margin: 2rem 0;
+    width: 100%;
   }
 
-  /* --- Search Bar --- */
-  .search-box {
+  button {
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* --- 1. Search Header --- */
+  .search-container {
     position: relative;
-    display: flex;
-    align-items: center;
     width: 100%;
   }
 
-  .search-box input {
+  .search-container input {
     width: 100%;
-    background: var(--sl-color-black); /* Starlight input bg */
-    border: 1px solid var(--border);
+    background: var(--sl-color-black);
+    border: 1px solid var(--il-border);
     padding: 0.8rem 1rem 0.8rem 2.8rem;
-    border-radius: var(--radius);
-    color: var(--sl-color-white);
+    border-radius: var(--il-radius);
+    color: var(--il-text-main);
     font-size: 1rem;
-    transition: border-color 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
 
-  .search-box input:focus {
+  .search-container input:focus {
     outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent);
+    border-color: var(--il-accent);
+    box-shadow: 0 0 0 2px var(--il-accent-low, rgba(100, 100, 255, 0.2));
   }
 
   .search-icon {
     position: absolute;
     left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
     width: 1.2rem;
     height: 1.2rem;
-    color: var(--text-muted);
+    color: var(--il-text-muted);
     pointer-events: none;
   }
 
-  .badge {
+  .count-badge {
     position: absolute;
-    right: 1rem;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
     font-size: 0.75rem;
-    background: var(--bg-surface);
-    color: var(--text-muted);
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    border: 1px solid var(--border);
+    font-weight: 500;
+    background: var(--il-bg);
+    color: var(--il-text-muted);
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+    border: 1px solid var(--il-border);
+    user-select: none;
   }
 
-  /* --- Category Rail --- */
+  .actions {
+    position: absolute;
+    right: 6.5rem; /* before count badge */
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    gap: 0.5rem;
+  }
+
+  /* --- 2. Active Selection Zone --- */
+  .active-zone {
+    background: var(--sl-color-gray-7, #111);
+    border: 1px solid var(--il-border);
+    border-radius: var(--il-radius);
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: opacity 0.3s ease;
+  }
+
+  .active-zone.hidden {
+    display: none;
+  }
+
+  .active-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--il-text-muted);
+    border-bottom: 1px solid var(--il-border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  :global(.selected-tag) {
+    background: var(--il-accent);
+    color: var(--sl-color-white);
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  :global(.selected-tag button) {
+    background: rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    line-height: 1;
+    transition: background 0.2s;
+  }
+
+  :global(.selected-tag button:hover) {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  @keyframes popIn {
+    from {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* --- 3. Rail Container --- */
+  .rail-container {
+    background: var(--sl-color-gray-6);
+    border-radius: var(--il-radius);
+    padding: 0.5rem;
+    border: 1px solid var(--il-border);
+  }
+
+  .rail-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding: 0 0.25rem;
+  }
+
+  .mini-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--il-border);
+    color: var(--il-text-main);
+    font-size: 0.85rem;
+    padding: 0.25rem 0;
+    width: 150px;
+  }
+  .mini-input:focus {
+    outline: none;
+    border-bottom-color: var(--il-accent);
+  }
+
+  .text-btn {
+    background: none;
+    border: none;
+    font-size: 0.75rem;
+    color: var(--il-text-muted);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+  .text-btn:hover {
+    opacity: 1;
+    color: var(--il-accent);
+  }
+  .text-btn.danger:hover {
+    color: var(--sl-color-red);
+  }
+
+  .rail-scroll-wrapper {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .category-rail {
     display: flex;
     gap: 0.5rem;
     overflow-x: auto;
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.5rem; /* Space for scrollbar */
     scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-    mask-image: linear-gradient(to right, black 90%, transparent 100%);
+    scrollbar-color: var(--il-border) transparent;
+    scroll-behavior: smooth;
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 20px,
+      #000 calc(100% - 20px),
+      transparent
+    );
   }
 
+  /* Buttons in Rail */
   .cat-chip {
     flex-shrink: 0;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--sl-color-gray-2);
-    padding: 0.4rem 1rem;
-    border-radius: 2rem;
-    cursor: pointer;
-    font-size: 0.9rem;
+    background: var(--sl-color-black);
+    border: 1px solid var(--il-border);
+    color: var(--il-text-muted);
+    padding: 0.35rem 0.85rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
     transition: all 0.2s ease;
+    white-space: nowrap;
   }
 
   .cat-chip:hover {
-    border-color: var(--sl-color-gray-3);
-    background: var(--sl-color-gray-6);
+    border-color: var(--il-text-muted);
+    color: var(--il-text-main);
+    background: var(--il-bg-hover);
   }
 
   .cat-chip.active {
-    background: var(--accent);
-    color: var(--sl-color-white);
-    border-color: var(--accent);
+    background: var(--il-accent);
+    color: white;
+    border-color: var(--il-accent);
     font-weight: 600;
   }
 
-  /* --- Grid & Cards --- */
-  .icon-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Dense modern grid */
-    gap: 0.75rem;
-    min-height: 300px;
+  .rail-arrow {
+    background: var(--sl-color-black);
+    border: 1px solid var(--il-border);
+    color: var(--il-text-muted);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    line-height: 0;
+    z-index: 2;
+  }
+  .rail-arrow:hover {
+    border-color: var(--il-accent);
+    color: var(--il-accent);
   }
 
-  /* Generated dynamically via JS, referencing global styles here for clarity */
+  /* --- 4. Grid --- */
+  .icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 1rem;
+    min-height: 200px;
+  }
+
   :global(.il-card) {
-    background: var(--sl-color-white);
-    border: 1px solid transparent;
-    border-radius: var(--radius);
-    padding: 1rem 0.5rem;
+    background: var(--sl-color-black);
+    border: 1px solid var(--il-border);
+    border-radius: var(--il-radius);
+    padding: 1.25rem 0.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 0.75rem;
     cursor: pointer;
     position: relative;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
+    overflow: hidden;
+  outline: none;
   }
 
   :global(.il-card:hover) {
-    background: var(--sl-color-gray-5);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+    border-color: var(--il-accent);
+    box-shadow: var(--il-shadow);
+    background: var(--il-bg-hover);
   }
 
   :global(.il-card img) {
-    width: 28px;
-    height: 28px;
-    filter: grayscale(100%) opacity(0.8); /* Starlight-style muted */
-    transition: all 0.2s;
+    width: 32px;
+    height: 32px;
+    color: var(--il-text-main);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
   :global(.il-card:hover img) {
-    filter: none;
-    transform: scale(1.1);
+    transform: scale(1.2);
   }
 
+  :global(.il-card:focus-visible) {
+    border-color: var(--il-accent);
+    box-shadow: 0 0 0 2px var(--il-accent);
+  }
+
+  /* Text labels */
   :global(.il-name) {
-    font-size: 0.7rem;
-    color: var(--sl-color-gray-3);
+    font-size: 0.75rem;
+    color: var(--il-text-muted);
     text-align: center;
+    width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 100%;
+    padding: 0 0.25rem;
+  }
+  :global(.il-card:hover .il-name) {
+    color: var(--il-text-main);
   }
 
-  /* Light mode adjustments */
-  @media (prefers-color-scheme: light) {
-      :global(.il-card) { background: var(--sl-color-white); }
-      :global(.il-card img) { filter: grayscale(40%) opacity(.85); color: #fff; }
-      :global(.il-name) { color: var(--sl-color-gray-4); }
-      :global(.il-card:hover img) { filter:none; }
-
-    }
-    
-    /* Dark mode: force white icon & label for contrast */
-    @media (prefers-color-scheme: dark) {
-    :global(.il-card) { background: var(--sl-color-white); }
-    :global(.il-card img) { filter:none; color:#fff; }
-    :global(.il-name) { color: #222; }
-    :global(.il-card:hover) { background: var(--sl-color-gray-2);}
+  :global(.il-collection) {
+    position: absolute;
+    top: 0.4rem;
+    left: 0.4rem;
+    font-size: 0.6rem;
+    color: var(--il-text-muted);
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
-  /* --- Loader --- */
+  /* Copied Toast */
+  :global(.il-toast) {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+    z-index: 10;
+  }
+  :global(.il-card.copied .il-toast) {
+    opacity: 1;
+  }
+
+  :global(.il-actions) {
+    position: absolute;
+    bottom: 0.4rem;
+    right: 0.4rem;
+    display: flex;
+    gap: 0.3rem;
+  }
+  :global(.il-actions button) {
+    background: var(--sl-color-black);
+    border: 1px solid var(--il-border);
+    color: var(--il-text-muted);
+    border-radius: 0.35rem;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.35rem;
+  }
+  :global(.il-actions button:hover) {
+    color: var(--il-text-main);
+    border-color: var(--il-accent);
+  }
+
+  /* --- 5. Loader --- */
   .loader {
     display: flex;
     justify-content: center;
@@ -213,35 +523,79 @@ const {
     opacity: 0;
     transition: opacity 0.3s;
   }
-  .loader.active { opacity: 1; }
-  
+  .loader.active {
+    opacity: 1;
+  }
+
   .spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--il-border);
+    border-top-color: var(--il-accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Toast notification for copy */
-  :global(.il-toast) {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background: var(--accent);
-    color: white;
-    font-size: 0.6rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    opacity: 0;
-    transform: translateY(5px);
-    transition: all 0.2s;
+  /* --- 6. Stats & Top Carousel --- */
+  .stats {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--il-text-muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
-  :global(.il-card.copied .il-toast) {
-    opacity: 1;
-    transform: translateY(0);
+  .stat-chip {
+    background: var(--sl-color-black);
+    border: 1px solid var(--il-border);
+    border-radius: 99px;
+    padding: 0.25rem 0.6rem;
+  }
+
+  .top-carousel {
+    margin-top: 0.5rem;
+    border: 1px solid var(--il-border);
+    border-radius: var(--il-radius);
+    padding: 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .top-track {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.5rem;
+  }
+  .top-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--sl-color-black);
+    border: 1px solid var(--il-border);
+    border-radius: 0.35rem;
+    padding: 0.25rem 0.45rem;
+    white-space: nowrap;
+    font-size: 0.75rem;
+  }
+  .top-item img { width: 18px; height: 18px; }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Light Mode Overrides */
+  @media (prefers-color-scheme: light) {
+    :global([data-theme="light"]) .il-wrapper {
+      --il-bg: #ffffff;
+      --il-bg-hover: #f3f4f6;
+    }
+    :global(.il-card) {
+      background: #fff;
+    }
+    :global(.il-card:hover) {
+      background: #f9fafb;
+    }
   }
 </style>
 
@@ -249,124 +603,475 @@ const {
   // @ts-nocheck
   class IconLibrary {
     constructor() {
-      // DOM Elements
-      this.grid = document.getElementById('il-grid');
-      this.loader = document.getElementById('il-loader');
-      this.input = document.getElementById('il-search');
-      this.countBadge = document.getElementById('il-count');
-      this.chips = document.querySelectorAll('.cat-chip');
+      // Elements
+      this.grid = document.getElementById("il-grid");
+      this.loader = document.getElementById("il-loader");
+      this.input = document.getElementById("il-search");
+      this.countBadge = document.getElementById("il-count");
+  this.exportBtn = document.getElementById("il-export");
+  this.themeToggle = document.getElementById("il-theme-toggle");
+  this.copyAria = document.getElementById("il-copy-aria");
+
+      this.rail = document.getElementById("il-rail");
+      this.activeZone = document.getElementById("il-active-zone");
+      this.selectedContainer = document.getElementById("il-selected");
+      this.collectionFilter = document.getElementById("il-collection-filter");
+  this.tabAll = document.getElementById("il-tab-all");
+  this.tabFav = document.getElementById("il-tab-fav");
+  this.tabRecent = document.getElementById("il-tab-recent");
+
+      this.statsEl = document.getElementById('il-stats');
+    this.topEl = document.getElementById('il-top');
+    this.topTrack = this.topEl ? this.topEl.querySelector('.top-track') : null;
+    this.topPrev = document.getElementById('il-top-prev');
+    this.topNext = document.getElementById('il-top-next');
 
       // State
-      this.activeCollection = document.querySelector('.cat-chip.active')?.dataset.collection || 'lucide';
-      this.icons = []; // Full list
-      this.visibleIcons = []; // Filtered list
+      this.defaultCollection = this.rail?.dataset.default || "lucide";
+      this.selected = new Set();
+
+  // Favorites & Recent
+  this.favorites = new Set(JSON.parse(localStorage.getItem("relaxicons:favorites") || "[]"));
+  this.recent = JSON.parse(localStorage.getItem("relaxicons:recent") || "[]"); // [{id, ts}]
+  this.maxRecent = 50;
+
+  // View state: all | favorites | recent
+  this.view = "all";
+
+      this.icons = [];
+      this.visibleIcons = [];
       this.renderCount = 0;
       this.BATCH_SIZE = 60;
       this.timeout = null;
 
+  // Cache & LRU
+  this.cache = new Map(); // key: prefix -> { names, ts }
+  this.cacheOrder = [];
+  this.maxCache = 20;
+
+  // Keyboard state
+  this.focusIndex = -1;
+
       this.init();
     }
 
-    init() {
-      // Listeners
-      this.input.addEventListener('input', () => this.handleSearch());
-      
-      this.chips.forEach(chip => {
-        chip.addEventListener('click', (e) => this.switchCollection(e.target));
+    async init() {
+      // 1. Setup Event Listeners
+      this.input.addEventListener("input", () => this.handleSearch());
+
+      // Rail Navigation
+      document
+        .getElementById("il-prev")
+        ?.addEventListener("click", () => this.scrollRail(-200));
+      document
+        .getElementById("il-next")
+        ?.addEventListener("click", () => this.scrollRail(200));
+
+      // Collection Controls
+      this.collectionFilter?.addEventListener("input", () =>
+        this.filterCollectionsInRail()
+      );
+      document
+        .getElementById("il-select-all")
+        ?.addEventListener("click", () => this.selectAllVisibleCollections());
+      document
+        .getElementById("il-clear-all")
+        ?.addEventListener("click", () => this.clearSelection());
+
+      // Chip Click Binding (Initial)
+      this.bindChipListeners();
+
+  // Tabs
+  this.tabAll?.addEventListener("click", () => this.switchView("all"));
+  this.tabFav?.addEventListener("click", () => this.switchView("favorites"));
+  this.tabRecent?.addEventListener("click", () => this.switchView("recent"));
+
+  // Export
+  this.exportBtn?.addEventListener("click", () => this.exportSelection());
+
+  // Theme toggle
+  this.themeToggle?.addEventListener("click", () => this.toggleTheme());
+
+  // Keyboard navigation
+  window.addEventListener("keydown", (e) => this.handleKey(e));
+
+      // 2. Initialize Selection
+      // If server rendered an active state, add it to set
+      const preActive = this.rail.querySelector(".cat-chip.active");
+      if (preActive) {
+        this.selected.add(preActive.dataset.collection);
+      } else {
+        this.selected.add(this.defaultCollection);
+      }
+
+      // If no chips exist (e.g. no props passed), fetch full list
+      if (!this.rail.querySelector(".cat-chip")) {
+        await this.loadAllCollectionsList();
+      }
+
+      this.updateUIState();
+      await this.fetchDataForSelection();
+
+      // 3. Infinite Scroll
+      this.observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) this.renderNextBatch();
+        },
+        { rootMargin: "300px" }
+      );
+      this.observer.observe(this.loader);
+    }
+
+    bindChipListeners() {
+      this.rail.querySelectorAll(".cat-chip").forEach((chip) => {
+        // Prevent duplicate bindings
+        if (chip.dataset.bound) return;
+        chip.dataset.bound = "true";
+        chip.addEventListener("click", (e) =>
+          this.toggleCollection(e.currentTarget.dataset.collection)
+        );
+      });
+    }
+
+    scrollRail(amount) {
+      this.rail.scrollBy({ left: amount, behavior: "smooth" });
+    }
+
+    scrollTop(amount) {
+    if (this.topTrack) this.topTrack.scrollBy({ left: amount, behavior: 'smooth' });
+  }
+
+    /* --- Collection Management --- */
+
+    toggleCollection(name) {
+      if (this.selected.has(name)) {
+        // Don't allow deselecting the last one if you want at least one active
+        // But for multi-select, it's okay to have 0, though we might show empty state.
+        this.selected.delete(name);
+      } else {
+        this.selected.add(name);
+      }
+      this.updateUIState();
+      this.fetchDataForSelection();
+    }
+
+    switchView(view) {
+      this.view = view; // all | favorites | recent
+      // aria states
+      this.tabAll?.setAttribute("aria-selected", String(view === "all"));
+      this.tabFav?.setAttribute("aria-selected", String(view === "favorites"));
+      this.tabRecent?.setAttribute("aria-selected", String(view === "recent"));
+      // render based on view
+      this.applySearchFilter();
+    }
+
+    clearSelection() {
+      this.selected.clear();
+      this.updateUIState();
+      this.fetchDataForSelection();
+    }
+
+    selectAllVisibleCollections() {
+      this.rail.querySelectorAll(".cat-chip").forEach((chip) => {
+        if (chip.style.display !== "none") {
+          this.selected.add(chip.dataset.collection);
+        }
+      });
+      this.updateUIState();
+      this.fetchDataForSelection();
+    }
+
+    filterCollectionsInRail() {
+      const q = (this.collectionFilter?.value || "").toLowerCase();
+      this.rail.querySelectorAll(".cat-chip").forEach((chip) => {
+        const show = chip.dataset.collection.toLowerCase().includes(q);
+        chip.style.display = show ? "" : "none";
+      });
+    }
+
+    /* --- UI Updates --- */
+
+    updateUIState() {
+      // 1. Update Rail Chips styling
+      this.rail.querySelectorAll(".cat-chip").forEach((chip) => {
+        const isActive = this.selected.has(chip.dataset.collection);
+        chip.classList.toggle("active", isActive);
+        chip.setAttribute("aria-selected", String(isActive));
       });
 
-      // Infinite Scroll
-      this.observer = new IntersectionObserver((entries) => {
-        if(entries[0].isIntersecting) this.renderNextBatch();
-      }, { rootMargin: '200px' });
-      
-      this.observer.observe(this.loader);
+      // 2. Render Active Tags Zone
+      if (this.selected.size > 0) {
+        this.activeZone.classList.remove("hidden");
+        this.selectedContainer.innerHTML = "";
 
-      // Initial Load
-      this.loadCollection(this.activeCollection);
-    }
+        Array.from(this.selected)
+          .sort()
+          .forEach((name) => {
+            const tag = document.createElement("span");
+            tag.className = "selected-tag";
+            tag.innerHTML = `${name} <button aria-label="Remove ${name}">×</button>`;
 
-    async switchCollection(targetBtn) {
-      // UI Toggle
-      this.chips.forEach(c => c.classList.remove('active'));
-      targetBtn.classList.add('active');
-      
-      // Logic
-      this.activeCollection = targetBtn.dataset.collection;
-      this.input.value = ''; // Reset search
-      await this.loadCollection(this.activeCollection);
-    }
+            tag.querySelector("button").addEventListener("click", (e) => {
+              e.stopPropagation();
+              this.toggleCollection(name);
+            });
 
-    async loadCollection(prefix) {
-      this.loader.classList.add('active');
-      this.grid.innerHTML = '';
-      this.countBadge.innerText = 'Loading...';
-      
-      try {
-        const res = await fetch(`https://api.iconify.design/collection?prefix=${prefix}`);
-        const data = await res.json();
-        
-        // Handle different API responses structure
-        this.icons = data.uncategorized || Object.keys(data.icons || {});
-        if (!this.icons.length && data.categories) {
-           this.icons = Object.values(data.categories).flat();
-        }
-
-        this.visibleIcons = this.icons;
-        this.renderCount = 0;
-        this.renderNextBatch();
-        this.updateCount();
-      } catch (err) {
-        this.grid.innerHTML = '<div style="color:var(--sl-color-red)">Failed to load icons.</div>';
-      } finally {
-        this.loader.classList.remove('active');
+            this.selectedContainer.appendChild(tag);
+          });
+      } else {
+        this.activeZone.classList.add("hidden");
       }
     }
+
+    /* --- Data Fetching --- */
+
+    async loadAllCollectionsList() {
+      try {
+        const res = await fetch("https://api.iconify.design/collections");
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const prefixes = Object.keys(data).sort();
+
+        const frag = document.createDocumentFragment();
+        prefixes.forEach((p) => {
+          const btn = document.createElement("button");
+          btn.className = "cat-chip";
+          btn.dataset.collection = p;
+          btn.textContent = p;
+          frag.appendChild(btn);
+        });
+
+        this.rail.innerHTML = ""; // clear initial props if any
+        this.rail.appendChild(frag);
+        this.bindChipListeners();
+      } catch (e) {
+        console.error("Failed to load collections list");
+      }
+    }
+
+  async fetchDataForSelection() {
+      this.loader.classList.add("active");
+      this.grid.innerHTML = "";
+      this.countBadge.innerText = "...";
+
+      const prefixes = Array.from(this.selected);
+
+      if (prefixes.length === 0) {
+        this.icons = [];
+        this.visibleIcons = [];
+        this.updateGrid();
+        this.loader.classList.remove("active");
+        this.countBadge.innerText = "Select a collection";
+        return;
+      }
+
+  // Concurrency + LRU cache
+  const promises = prefixes.map((p) => this.fetchCollectionCached(p));
+  const fetchedArrays = await Promise.all(promises);
+  this.icons = fetchedArrays.flat();
+    this.computeStatsAndTop();
+
+      // Re-apply search filter if exists
+      this.applySearchFilter();
+      this.loader.classList.remove("active");
+    }
+
+    computeStatsAndTop() {
+    // Stats: counts per selected collection
+    if (this.statsEl) {
+      const counts = {};
+      for (const it of this.icons) {
+        counts[it.pfx] = (counts[it.pfx] || 0) + 1;
+      }
+      const frag = document.createDocumentFragment();
+      Object.keys(counts).sort().forEach((p) => {
+        const chip = document.createElement('span');
+        chip.className = 'stat-chip';
+        chip.textContent = `${p}: ${counts[p]} icons`;
+        frag.appendChild(chip);
+      });
+      this.statsEl.innerHTML = '';
+      this.statsEl.appendChild(frag);
+    }
+    // Top icons: take first few per collection
+    if (this.topTrack) {
+      this.topTrack.innerHTML = '';
+      const byPfx = new Map();
+      for (const it of this.icons) {
+        const arr = byPfx.get(it.pfx) || [];
+        if (arr.length < 5) arr.push(it);
+        byPfx.set(it.pfx, arr);
+      }
+      const items = [];
+      for (const [pfx, arr] of byPfx.entries()) {
+        arr.forEach((it) => items.push(it));
+      }
+      items.slice(0, 30).forEach((it) => {
+        const div = document.createElement('div');
+        div.className = 'top-item';
+        div.innerHTML = `<img src="https://api.iconify.design/${it.pfx}/${it.name}.svg" alt="${it.name}" /> <span>${it.pfx}:${it.name}</span>`;
+        this.topTrack.appendChild(div);
+      });
+    }
+  }
+
+    async fetchCollectionCached(prefix) {
+      // cache hit
+      if (this.cache.has(prefix)) {
+        this.touchCache(prefix);
+        const names = this.cache.get(prefix).names;
+        return names.map((n) => ({ pfx: prefix, name: n }));
+      }
+      // fetch
+      try {
+        const res = await fetch(`https://api.iconify.design/collection?prefix=${prefix}`);
+        if (!res.ok) throw new Error("network");
+        const data = await res.json();
+        let names = data.uncategorized || Object.keys(data.icons || {});
+        if (!names.length && data.categories) {
+          names = Object.values(data.categories).flat();
+        }
+        // store cache
+        this.putCache(prefix, names);
+        return names.map((n) => ({ pfx: prefix, name: n }));
+      } catch (e) {
+        // offline fallback: try localStorage
+        const offline = JSON.parse(localStorage.getItem(`relaxicons:cache:${prefix}`) || "[]");
+        if (offline.length) {
+          this.putCache(prefix, offline);
+          return offline.map((n) => ({ pfx: prefix, name: n }));
+        }
+        return [];
+      }
+    }
+
+    putCache(prefix, names) {
+      this.cache.set(prefix, { names, ts: Date.now() });
+      localStorage.setItem(`relaxicons:cache:${prefix}`, JSON.stringify(names));
+      this.cacheOrder = this.cacheOrder.filter((p) => p !== prefix);
+      this.cacheOrder.push(prefix);
+      if (this.cacheOrder.length > this.maxCache) {
+        const evict = this.cacheOrder.shift();
+        this.cache.delete(evict);
+      }
+    }
+    touchCache(prefix) {
+      this.cacheOrder = this.cacheOrder.filter((p) => p !== prefix);
+      this.cacheOrder.push(prefix);
+    }
+
+    /* --- Search & Grid Rendering --- */
 
     handleSearch() {
       clearTimeout(this.timeout);
       this.timeout = setTimeout(() => {
-        const query = this.input.value.toLowerCase().trim();
-        
-        if (!query) {
-          this.visibleIcons = this.icons;
-        } else {
-          this.visibleIcons = this.icons.filter(name => name.includes(query));
-        }
-        
-        this.renderCount = 0;
-        this.grid.innerHTML = '';
-        this.renderNextBatch();
-        this.updateCount();
+        this.applySearchFilter();
       }, 300);
     }
 
-    renderNextBatch() {
-      const batch = this.visibleIcons.slice(this.renderCount, this.renderCount + this.BATCH_SIZE);
+    applySearchFilter() {
+      const query = this.input.value.toLowerCase().trim();
+      let base = this.icons;
+      if (this.view === "favorites") {
+        base = base.filter((it) => this.favorites.has(`${it.pfx}:${it.name}`));
+      } else if (this.view === "recent") {
+        const recentIds = new Set(this.recent.map((r) => r.id));
+        base = base.filter((it) => recentIds.has(`${it.pfx}:${it.name}`));
+      }
+      this.visibleIcons = !query ? base : base.filter((it) => it.name.includes(query));
+      this.updateGrid();
+    }
+
+    updateGrid() {
+      this.grid.innerHTML = "";
+      this.renderCount = 0;
+      this.countBadge.innerText = `${this.visibleIcons.length} icons`;
+
+      if (this.visibleIcons.length === 0 && this.selected.size > 0) {
+        this.grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--il-text-muted);padding:2rem;">No icons found.</div>`;
+        return;
+      }
+
+      this.renderNextBatch();
+    }
+
+  renderNextBatch() {
+      const batch = this.visibleIcons.slice(
+        this.renderCount,
+        this.renderCount + this.BATCH_SIZE
+      );
+
       if (batch.length === 0) return;
 
       const frag = document.createDocumentFragment();
 
-      batch.forEach(name => {
-        const card = document.createElement('div');
-        card.className = 'il-card';
-        card.setAttribute('role', 'button');
-        card.title = `Click to copy: ${name}`;
-        
-        // Command to copy
-        const cmd = `relaxicons add ${this.activeCollection}:${name}`;
+      batch.forEach((entry, idx) => {
+        const card = document.createElement("div");
+        card.className = "il-card";
+        const fullName = `${entry.pfx}:${entry.name}`;
+        const cmd = `relaxicons add ${fullName}`;
+        card.setAttribute("tabindex", "0");
+        card.setAttribute("role", "button");
+        card.setAttribute("aria-label", `Copy add command for ${fullName}`);
 
         card.innerHTML = `
-          <div class="il-toast">Copied</div>
-          <img src="https://api.iconify.design/${this.activeCollection}/${name}.svg" loading="lazy" style="width:32px;height:32px;" />
-          <span class="il-name">${name}</span>
+          <div class="il-toast">Copied!</div>
+          <span class="il-collection">${entry.pfx}</span>
+          <img 
+            src="https://api.iconify.design/${entry.pfx}/${entry.name}.svg" 
+            loading="lazy" 
+            onerror="this.style.display='none'"
+          />
+          <span class="il-name" title="${entry.name}">${entry.name}</span>
+          <div class="il-actions">
+            <button class="il-copy-cmd" aria-label="Copy CLI command">CMD</button>
+            <button class="il-copy-svg" aria-label="Copy raw SVG">SVG</button>
+            <button class="il-copy-data" aria-label="Copy data URL">DATA</button>
+            <button class="il-fav" aria-label="Toggle favorite">★</button>
+          </div>
         `;
 
-        // Click to Copy Logic
-        card.addEventListener('click', () => {
+        const copyCmd = () => {
           navigator.clipboard.writeText(cmd);
-          card.classList.add('copied');
-          setTimeout(() => card.classList.remove('copied'), 1500);
+          this.announceCopy(`${fullName} command copied`);
+          this.markRecent(fullName);
+          card.classList.add("copied");
+          setTimeout(() => card.classList.remove("copied"), 1500);
+        };
+        card.addEventListener("click", copyCmd);
+        card.addEventListener("keyup", (e) => {
+          if (e.key === "Enter") copyCmd();
+        });
+
+        // Button actions
+        card.querySelector(".il-copy-cmd").addEventListener("click", (e) => {
+          e.stopPropagation();
+          copyCmd();
+        });
+        card.querySelector(".il-copy-svg").addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const svg = await this.fetchSvg(entry.pfx, entry.name);
+          if (svg) {
+            await navigator.clipboard.writeText(svg);
+            this.announceCopy(`${fullName} SVG copied`);
+          }
+        });
+        card.querySelector(".il-copy-data").addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const svg = await this.fetchSvg(entry.pfx, entry.name);
+          if (svg) {
+            const dataUrl = `data:image/svg+xml;base64,${btoa(svg)}`;
+            await navigator.clipboard.writeText(dataUrl);
+            this.announceCopy(`${fullName} data URL copied`);
+          }
+        });
+        const favBtn = card.querySelector(".il-fav");
+        const id = fullName;
+        this.updateFavButton(favBtn, id);
+        favBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.toggleFavorite(id);
+          this.updateFavButton(favBtn, id);
         });
 
         frag.appendChild(card);
@@ -374,13 +1079,106 @@ const {
 
       this.grid.appendChild(frag);
       this.renderCount += batch.length;
+      // manage focus index
+      if (this.focusIndex === -1 && this.grid.firstElementChild) {
+        this.focusIndex = 0;
+      }
     }
 
-    updateCount() {
-      this.countBadge.innerText = `${this.visibleIcons.length} icons`;
+    updateFavButton(btn, id) {
+      const active = this.favorites.has(id);
+      btn.textContent = active ? "★" : "☆";
+      btn.setAttribute("aria-pressed", String(active));
+    }
+
+    toggleFavorite(id) {
+      if (this.favorites.has(id)) this.favorites.delete(id);
+      else this.favorites.add(id);
+      localStorage.setItem("relaxicons:favorites", JSON.stringify(Array.from(this.favorites)));
+    }
+
+    markRecent(id) {
+      const now = Date.now();
+      // remove duplicates
+      this.recent = this.recent.filter((r) => r.id !== id);
+      this.recent.unshift({ id, ts: now });
+      if (this.recent.length > this.maxRecent) this.recent.length = this.maxRecent;
+      localStorage.setItem("relaxicons:recent", JSON.stringify(this.recent));
+    }
+
+    async fetchSvg(pfx, name) {
+      try {
+        const res = await fetch(`https://api.iconify.design/${pfx}/${name}.svg`);
+        if (!res.ok) return null;
+        return await res.text();
+      } catch {
+        return null;
+      }
+    }
+
+    exportSelection() {
+      const selected = Array.from(this.selected).sort();
+      const json = JSON.stringify({ collections: selected }, null, 2);
+      const reactSnippet = selected
+        .map((p) => `import ${p}Icons from '@iconify-json/${p}';`)
+        .join('\n');
+      const content = `// Collections\n${json}\n\n// React imports\n${reactSnippet}\n`;
+      navigator.clipboard.writeText(content);
+      this.announceCopy("Selection exported to clipboard");
+    }
+
+    announceCopy(msg) {
+      if (this.copyAria) this.copyAria.textContent = msg;
+    }
+
+    toggleTheme() {
+      const root = document.documentElement;
+      const current = root.getAttribute("data-theme") || "dark";
+      const next = current === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+    }
+
+    handleKey(e) {
+      const cards = Array.from(this.grid.querySelectorAll('.il-card'));
+      const cols = this.computeCols();
+      if (!cards.length) return;
+      if (["ArrowRight","ArrowLeft","ArrowDown","ArrowUp"].includes(e.key)) {
+        e.preventDefault();
+      }
+      switch (e.key) {
+        case "ArrowRight":
+          this.focusIndex = Math.min(cards.length - 1, this.focusIndex + 1);
+          break;
+        case "ArrowLeft":
+          this.focusIndex = Math.max(0, this.focusIndex - 1);
+          break;
+        case "ArrowDown":
+          this.focusIndex = Math.min(cards.length - 1, this.focusIndex + cols);
+          break;
+        case "ArrowUp":
+          this.focusIndex = Math.max(0, this.focusIndex - cols);
+          break;
+        case "Enter":
+          if (this.focusIndex >= 0 && cards[this.focusIndex]) {
+            cards[this.focusIndex].click();
+          }
+          return;
+        default:
+          return;
+      }
+      const target = cards[this.focusIndex];
+      if (target) target.focus({ preventScroll: false });
+    }
+
+    computeCols() {
+      // approximate columns based on card width
+      const grid = this.grid.getBoundingClientRect();
+      const sample = this.grid.querySelector('.il-card');
+      const cardWidth = sample ? sample.getBoundingClientRect().width + 16 /* gap */ : 120;
+      return Math.max(1, Math.floor(grid.width / cardWidth));
     }
   }
 
-  // Initialize
+  // Init
   new IconLibrary();
 </script>

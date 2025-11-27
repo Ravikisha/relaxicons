@@ -1,0 +1,61 @@
+---
+// No server-side imports needed for this client-side logic
+---
+
+<section>
+  <h2>All Iconify Collections</h2>
+
+  <p><strong>Total:</strong> <span id="collections-total">…</span></p>
+  <p id="collections-error" style="color: var(--sl-color-danger);"></p>
+
+  <ul
+    id="collections-list"
+    style="columns: 3; gap: 1rem; list-style: none; padding-left: 0;"
+  >
+    <li>Loading...</li>
+  </ul>
+</section>
+
+<script>
+  // This code runs in the browser (Client-side)
+  (async () => {
+    const listEl = document.getElementById("collections-list");
+    const totalEl = document.getElementById("collections-total");
+    const errorEl = document.getElementById("collections-error");
+
+    try {
+      const res = await fetch("https://api.iconify.design/collections");
+
+      if (!res.ok) throw new Error("Failed to load collections");
+
+      const data = await res.json();
+      const collections = Object.keys(data).sort();
+
+      // Update DOM
+      if (listEl) {
+        listEl.innerHTML = ""; // Clear "Loading..." text
+
+        for (const name of collections) {
+          const li = document.createElement("li");
+          li.textContent = name;
+          li.style = "break-inside: avoid; margin-bottom: 0.5rem; background: var(--sl-color-background-contrast); padding: 0.25rem 0.5rem; border-radius: 0.3rem;"; 
+          listEl.appendChild(li);
+        }
+      }
+
+      if (totalEl) {
+        totalEl.textContent = String(collections.length);
+      }
+    } catch (e) {
+      console.error(e);
+      const errorMessage = e instanceof Error ? e.message : "Unknown error";
+
+      if (errorEl) {
+        errorEl.textContent = errorMessage;
+      }
+
+      // Clean up loading state if error
+      if (listEl) listEl.innerHTML = "";
+    }
+  })();
+</script>

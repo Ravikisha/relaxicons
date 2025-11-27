@@ -5,8 +5,13 @@ description: Browse an icon collection and copy CLI commands.
 
 import IconGrid from '../../components/IconGrid.astro';
 
-# Icon Explorer
 
-Search the `lucide` collection and copy commands:
+Browse multiple collections. Use search to fuzzy match substrings; optional filters restrict to starts/ends-with your query. Click Copy to get the CLI command.
 
-<IconGrid collection="lucide" />
+<IconGrid defaultCollection="lucide" />
+
+## Tips
+
+- Combine search + starts-with for prefix scoping (e.g. `alert`).
+- Switch collections to compare naming patterns. The list of collections loads live from Iconify, so all collections are supported.
+- Output command copies in format: `relaxicons add <collection>:<icon>`.

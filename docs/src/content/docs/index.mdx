@@ -3,23 +3,23 @@ title: Relaxicons
 description: Fetch, transform, and generate icon components effortlessly.
 slug: /
 hero:
-  tagline: Generate framework-ready icon components from Iconify IDs.
+  tagline: Generate framework-ready icon components.
   image:
     file: ../../../public/logo.png
   actions:
     - text: Get Started
-      link: /getting-started/
+      link: /relaxicons/getting-started/
     - text: CLI Reference
-      link: /cli/
+      link: /relaxicons/cli/
     - text: Icon Explorer
-      link: /icon-explorer/
+      link: /relaxicons/icon-explorer/
 ---
 
 import CopyButton from '../../components/CopyButton.astro';
 
 # Relaxicons
 
-Relaxicons is a CLI that turns any Iconify icon (e.g. `lucide:home`) into a polished component for React, Vue, Angular, or Laravel.
+Relaxicons is a CLI that turns any icon (e.g. `lucide:home`) into a polished component for React, Vue, Angular, Laravel, Svelte, Solid, Web Components, and Next.js (RSC-safe).
 
 ```bash
 npm install -g relaxicons
@@ -34,23 +34,48 @@ relaxicons add lucide:home
 - Fetch & suggest icons from collections
 - Transform SVG (strip dimensions, set `currentColor`)
 - Output multi-framework components
+  (React, Vue, Angular, Laravel, Svelte, Solid, Web Components, RSC)
 - Auto formatting & barrel export updates
 - Fuzzy suggestions & list filtering
 
+## Frameworks
+
+<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:'16px',alignItems:'center'}}>
+  <img src={`${import.meta.env.BASE_URL}frameworks/react.svg`} alt="React" width="120" />
+  <img src={`${import.meta.env.BASE_URL}frameworks/vue.svg`} alt="Vue" width="120" />
+  <img src={`${import.meta.env.BASE_URL}frameworks/angular.svg`} alt="Angular" width="120" />
+  <img src={`${import.meta.env.BASE_URL}frameworks/svelte.svg`} alt="Svelte" width="120" />
+  <img src={`${import.meta.env.BASE_URL}frameworks/solid.svg`} alt="Solid" width="120" />
+  <img src={`${import.meta.env.BASE_URL}frameworks/webc.svg`} alt="Web Components" width="120" />
+  <img src={`${import.meta.env.BASE_URL}frameworks/next.svg`} alt="Next.js" width="120" />
+</div>
+
 ## Quick Links
 
-- [Getting Started](/getting-started/)
-- [CLI Reference](/cli/)
-- [Icon Explorer](/icon-explorer/)
-- [Configuration](/configuration/)
-- [Transform Pipeline](/transform/)
-- [Framework Adapters](/framework-adapters/)
-- [FAQ](/faq/)
+- [Getting Started](/relaxicons/getting-started/)
+- [CLI Reference](/relaxicons/cli/)
+- [Collections](/relaxicons/collections/)
+- [Icon Explorer](/relaxicons/icon-explorer/)
+- [Compare Collections](/relaxicons/compare-collections/)
+- [Configuration](/relaxicons/configuration/)
+- [Transform Pipeline](/relaxicons/transform/)
+- [Framework Adapters](/relaxicons/framework-adapters/)
+- [FAQ](/relaxicons/faq/)
 
 ## Why Relaxicons?
+### New in the Explorer
+- Favorites & Recent tabs
+- Keyboard shortcuts (arrows + Enter)
+- Export selection and copy variants (CMD/SVG/DATA)
+- Per-collection stats and a top-icons carousel
+
+### CLI additions
+- `relaxicons stats` — counts per collection (supports `-c`)
+- `relaxicons doctor --verbose` — diagnostics
+- `relaxicons cache-clear` — placeholder
 
 Manually copying SVGs into components is repetitive. Relaxicons standardizes attributes, injects accessibility-friendly defaults, and keeps your icon library organized. Focus on building—let the tooling handle boilerplate.
 
 ## Next Steps
 
-Head to [Getting Started](/getting-started/) to create your `icon.config.json` and add your first icon.
+Head to [Getting Started](/relaxicons/getting-started/) to create your `relaxicons.config.json` and add your first icon.

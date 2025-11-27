@@ -6,7 +6,7 @@ import starlight from "@astrojs/starlight";
 
 export default defineConfig({
   site: 'https://ravikisha.github.io',
-  base: '/relaxicons',
+  base: '/relaxicons/',
   integrations: [
     starlight({
       title: "Relaxicons",

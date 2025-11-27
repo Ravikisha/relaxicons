@@ -12,6 +12,7 @@ Relaxicons fetches raw SVG, then processes it to make theme-friendly components.
 2. Ensure `fill="currentColor"` or `stroke="currentColor"` is applied for color inheritance.
 3. Strip extraneous `data-` attributes that don't affect rendering.
 4. Preserve `viewBox` for scaling.
+Optional: If `optimizeSvg` is enabled in config and `svgo` is installed, the raw SVG is optimized with SVGO before transformation. Provide an object to pass custom SVGO options.
 
 ## Result Structure
 Internal representation:
