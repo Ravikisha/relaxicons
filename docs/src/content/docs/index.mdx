@@ -17,6 +17,19 @@ hero:
 
 import CopyButton from "../../components/CopyButton.astro";
 
+<script type="application/ld+json" is:raw>
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Relaxicons",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Cross-platform",
+  "url": "https://ravikisha.github.io/relaxicons/",
+  "image": `${import.meta.env.BASE_URL}logo.png`,
+  "description": "Fetch, transform, and generate icon components effortlessly."
+})}
+</script>
+
 # Relaxicons
 
 Relaxicons is a CLI that turns any icon (e.g. `lucide:home`) into a polished component for React, Vue, Angular, Laravel, Svelte, Solid, Web Components, and Next.js (RSC-safe).

@@ -26,10 +26,6 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
         placeholder="Search icons..."
         autocomplete="off"
       />
-      <div class="actions">
-        <button id="il-export" class="text-btn" aria-label="Export selection">Export</button>
-        <button id="il-theme-toggle" class="text-btn" aria-label="Toggle theme">Toggle Theme</button>
-      </div>
       <div id="il-count" class="count-badge">0 icons</div>
     </div>
   </div>
@@ -53,9 +49,21 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
       />
       <button id="il-select-all" class="text-btn">Select Visible</button>
       <div class="tabs" role="tablist" aria-label="Views">
-        <button id="il-tab-all" class="text-btn" role="tab" aria-selected="true">All</button>
-        <button id="il-tab-fav" class="text-btn" role="tab" aria-selected="false">Favorites</button>
-        <button id="il-tab-recent" class="text-btn" role="tab" aria-selected="false">Recent</button>
+        <button id="il-tab-all" class="text-btn" role="tab" aria-selected="true"
+          >All Icons</button
+        >
+        <button
+          id="il-tab-fav"
+          class="text-btn"
+          role="tab"
+          aria-selected="false">Favorites</button
+        >
+        <button
+          id="il-tab-recent"
+          class="text-btn"
+          role="tab"
+          aria-selected="false">Recent</button
+        >
       </div>
     </div>
 
@@ -116,9 +124,9 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     --il-accent: var(--sl-color-accent);
     --il-text-main: var(--sl-color-white);
     --il-text-muted: var(--sl-color-gray-3);
-    --il-radius: 0.5rem;
+    --il-radius: 0.75rem;
     --il-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      0 6px 12px -4px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
 
     font-family: var(--sl-font-system);
     display: flex;
@@ -137,13 +145,16 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
   .search-container {
     position: relative;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
   }
 
   .search-container input {
     width: 100%;
     background: var(--sl-color-black);
     border: 1px solid var(--il-border);
-    padding: 0.8rem 1rem 0.8rem 2.8rem;
+    padding: 0.9rem 7.5rem 0.9rem 2.8rem; /* extra right padding for count */
     border-radius: var(--il-radius);
     color: var(--il-text-main);
     font-size: 1rem;
@@ -178,18 +189,21 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     background: var(--il-bg);
     color: var(--il-text-muted);
     padding: 0.2rem 0.6rem;
-    border-radius: 99px;
+    border-radius: 999px;
     border: 1px solid var(--il-border);
     user-select: none;
+    white-space: nowrap;
   }
 
+  /* (actions class is unused now but harmless if left in) */
   .actions {
     position: absolute;
-    right: 6.5rem; /* before count badge */
+    right: 6.5rem;
     top: 50%;
     transform: translateY(-50%);
     display: inline-flex;
     gap: 0.5rem;
+    align-items: center;
   }
 
   /* --- 2. Active Selection Zone --- */
@@ -229,7 +243,7 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     background: var(--il-accent);
     color: var(--sl-color-white);
     padding: 0.25rem 0.75rem;
-    border-radius: 99px;
+    border-radius: 999px;
     font-size: 0.8rem;
     display: inline-flex;
     align-items: center;
@@ -273,16 +287,21 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
   .rail-container {
     background: var(--sl-color-gray-6);
     border-radius: var(--il-radius);
-    padding: 0.5rem;
+    padding: 0.75rem;
     border: 1px solid var(--il-border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .rail-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.25rem;
     padding: 0 0.25rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
   }
 
   .mini-input {
@@ -292,7 +311,7 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     color: var(--il-text-main);
     font-size: 0.85rem;
     padding: 0.25rem 0;
-    width: 150px;
+    width: 180px;
   }
   .mini-input:focus {
     outline: none;
@@ -307,8 +326,10 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
-    opacity: 0.8;
-    transition: opacity 0.2s;
+    opacity: 0.85;
+    transition:
+      opacity 0.2s,
+      color 0.2s;
   }
   .text-btn:hover {
     opacity: 1;
@@ -316,6 +337,27 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
   }
   .text-btn.danger:hover {
     color: var(--sl-color-red);
+  }
+
+  .tabs {
+    display: inline-flex;
+    gap: 0.25rem;
+    padding: 0.1rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .tabs .text-btn {
+    text-decoration: none;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    opacity: 0.7;
+  }
+
+  .tabs .text-btn[aria-selected="true"] {
+    background: var(--sl-color-black);
+    color: var(--il-text-main);
+    opacity: 1;
   }
 
   .rail-scroll-wrapper {
@@ -335,14 +377,14 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
-    border: 0;
+    border-width: 0;
   }
 
   .category-rail {
     display: flex;
     gap: 0.5rem;
     overflow-x: auto;
-    padding-bottom: 0.5rem; /* Space for scrollbar */
+    padding: 0.25rem 0 0.5rem;
     scrollbar-width: thin;
     scrollbar-color: var(--il-border) transparent;
     scroll-behavior: smooth;
@@ -361,8 +403,8 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     background: var(--sl-color-black);
     border: 1px solid var(--il-border);
     color: var(--il-text-muted);
-    padding: 0.35rem 0.85rem;
-    border-radius: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.75rem;
     font-size: 0.8rem;
     transition: all 0.2s ease;
     white-space: nowrap;
@@ -382,65 +424,69 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
   }
 
   .rail-arrow {
-    background: var(--sl-color-black);
+    background: var(--il-bg);
     border: 1px solid var(--il-border);
     color: var(--il-text-muted);
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
     line-height: 0;
     z-index: 2;
+    flex-shrink: 0;
   }
   .rail-arrow:hover {
     border-color: var(--il-accent);
     color: var(--il-accent);
+    background: var(--il-bg-hover);
   }
 
   /* --- 4. Grid --- */
   .icon-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1.25rem;
     min-height: 200px;
   }
 
   :global(.il-card) {
-    background: var(--sl-color-black);
+    background: var(--il-bg);
     border: 1px solid var(--il-border);
-    border-radius: var(--il-radius);
-    padding: 1.25rem 0.5rem;
+    border-radius: 1rem;
+    padding: 1.5rem 0.75rem 1.75rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 0.9rem;
     cursor: pointer;
     position: relative;
-    transition: all 0.2s ease;
+    transition: all 0.18s ease-out;
     overflow: hidden;
-  outline: none;
+    outline: none;
   }
 
   :global(.il-card:hover) {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     border-color: var(--il-accent);
     box-shadow: var(--il-shadow);
     background: var(--il-bg-hover);
   }
 
   :global(.il-card img) {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     color: var(--il-text-main);
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition:
+      transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+      filter 0.18s;
   }
 
   :global(.il-card:hover img) {
-    transform: scale(1.2);
+    transform: scale(1.16);
   }
 
   :global(.il-card:focus-visible) {
@@ -450,14 +496,14 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
 
   /* Text labels */
   :global(.il-name) {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: var(--il-text-muted);
     text-align: center;
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 0 0.25rem;
+    padding: 0 0.4rem;
   }
   :global(.il-card:hover .il-name) {
     color: var(--il-text-main);
@@ -465,11 +511,11 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
 
   :global(.il-collection) {
     position: absolute;
-    top: 0.4rem;
-    left: 0.4rem;
-    font-size: 0.6rem;
+    top: 0.45rem;
+    left: 0.65rem;
+    font-size: 0.65rem;
     color: var(--il-text-muted);
-    opacity: 0.6;
+    opacity: 0.7;
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -486,7 +532,7 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     font-weight: bold;
     font-size: 0.9rem;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.18s;
     backdrop-filter: blur(2px);
     pointer-events: none;
     z-index: 10;
@@ -497,22 +543,27 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
 
   :global(.il-actions) {
     position: absolute;
-    bottom: 0.4rem;
-    right: 0.4rem;
+    bottom: 0.45rem;
     display: flex;
     gap: 0.3rem;
   }
   :global(.il-actions button) {
-    background: var(--sl-color-black);
+    background: var(--il-bg);
     border: 1px solid var(--il-border);
     color: var(--il-text-muted);
-    border-radius: 0.35rem;
+    border-radius: 0.45rem;
     font-size: 0.65rem;
-    padding: 0.15rem 0.35rem;
+    padding: 0.15rem 0.4rem;
   }
+
+  :global(.il-actions button:first-child) {
+    margin-top: 1rem;
+  }
+
   :global(.il-actions button:hover) {
     color: var(--il-text-main);
     border-color: var(--il-accent);
+    background: var(--il-bg-hover);
   }
 
   /* --- 5. Loader --- */
@@ -535,6 +586,7 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
+
   /* --- 6. Stats & Top Carousel --- */
   .stats {
     margin-top: 0.75rem;
@@ -542,12 +594,12 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     color: var(--il-text-muted);
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
   .stat-chip {
     background: var(--sl-color-black);
     border: 1px solid var(--il-border);
-    border-radius: 99px;
+    border-radius: 999px;
     padding: 0.25rem 0.6rem;
   }
 
@@ -572,29 +624,69 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     gap: 0.4rem;
     background: var(--sl-color-black);
     border: 1px solid var(--il-border);
-    border-radius: 0.35rem;
+    border-radius: 0.45rem;
     padding: 0.25rem 0.45rem;
     white-space: nowrap;
     font-size: 0.75rem;
   }
-  .top-item img { width: 18px; height: 18px; }
+  .top-item img {
+    width: 18px;
+    height: 18px;
+  }
+
   @keyframes spin {
     to {
       transform: rotate(360deg);
     }
   }
 
-  /* Light Mode Overrides */
-  @media (prefers-color-scheme: light) {
-    :global([data-theme="light"]) .il-wrapper {
-      --il-bg: #ffffff;
-      --il-bg-hover: #f3f4f6;
+  /* --- Light Mode Overrides (Starlight data-theme) --- */
+  /* :global([data-theme="light"]) .il-wrapper {
+    --il-bg: #ffffff;
+    --il-bg-hover: #f3f4f6;
+    --il-border: var(--sl-color-gray-5);
+    --il-text-main: var(--sl-color-gray-9);
+    --il-text-muted: var(--sl-color-gray-6);
+  }
+
+  :global([data-theme="light"]) .il-card {
+    background: var(--il-bg);
+  }
+  :global([data-theme="light"]) .il-card:hover {
+    background: var(--il-bg-hover);
+  }
+
+  :global([data-theme="light"]) .il-actions button {
+    background: var(--il-bg);
+  } */
+
+  /* --- Small-screen tweaks (fix overlapping badge) --- */
+  @media (max-width: 640px) {
+    .search-container {
+      align-items: stretch;
+      gap: 0.5rem;
     }
-    :global(.il-card) {
-      background: #fff;
+
+    .search-container input {
+      padding-right: 1rem;
     }
-    :global(.il-card:hover) {
-      background: #f9fafb;
+
+    .actions,
+    .count-badge {
+      position: static;
+      transform: none;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-start;
+      gap: 0.75rem;
+      order: 1;
+    }
+
+    .count-badge {
+      align-self: flex-end;
+      margin-top: 0.1rem;
     }
   }
 </style>
@@ -608,35 +700,39 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
       this.loader = document.getElementById("il-loader");
       this.input = document.getElementById("il-search");
       this.countBadge = document.getElementById("il-count");
-  this.exportBtn = document.getElementById("il-export");
-  this.themeToggle = document.getElementById("il-theme-toggle");
-  this.copyAria = document.getElementById("il-copy-aria");
+      this.copyAria = document.getElementById("il-copy-aria");
 
       this.rail = document.getElementById("il-rail");
       this.activeZone = document.getElementById("il-active-zone");
       this.selectedContainer = document.getElementById("il-selected");
       this.collectionFilter = document.getElementById("il-collection-filter");
-  this.tabAll = document.getElementById("il-tab-all");
-  this.tabFav = document.getElementById("il-tab-fav");
-  this.tabRecent = document.getElementById("il-tab-recent");
+      this.tabAll = document.getElementById("il-tab-all");
+      this.tabFav = document.getElementById("il-tab-fav");
+      this.tabRecent = document.getElementById("il-tab-recent");
 
-      this.statsEl = document.getElementById('il-stats');
-    this.topEl = document.getElementById('il-top');
-    this.topTrack = this.topEl ? this.topEl.querySelector('.top-track') : null;
-    this.topPrev = document.getElementById('il-top-prev');
-    this.topNext = document.getElementById('il-top-next');
+      this.statsEl = document.getElementById("il-stats");
+      this.topEl = document.getElementById("il-top");
+      this.topTrack = this.topEl
+        ? this.topEl.querySelector(".top-track")
+        : null;
+      this.topPrev = document.getElementById("il-top-prev");
+      this.topNext = document.getElementById("il-top-next");
 
       // State
       this.defaultCollection = this.rail?.dataset.default || "lucide";
       this.selected = new Set();
 
-  // Favorites & Recent
-  this.favorites = new Set(JSON.parse(localStorage.getItem("relaxicons:favorites") || "[]"));
-  this.recent = JSON.parse(localStorage.getItem("relaxicons:recent") || "[]"); // [{id, ts}]
-  this.maxRecent = 50;
+      // Favorites & Recent
+      this.favorites = new Set(
+        JSON.parse(localStorage.getItem("relaxicons:favorites") || "[]")
+      );
+      this.recent = JSON.parse(
+        localStorage.getItem("relaxicons:recent") || "[]"
+      ); // [{id, ts}]
+      this.maxRecent = 50;
 
-  // View state: all | favorites | recent
-  this.view = "all";
+      // View state: all | favorites | recent
+      this.view = "all";
 
       this.icons = [];
       this.visibleIcons = [];
@@ -644,13 +740,13 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
       this.BATCH_SIZE = 60;
       this.timeout = null;
 
-  // Cache & LRU
-  this.cache = new Map(); // key: prefix -> { names, ts }
-  this.cacheOrder = [];
-  this.maxCache = 20;
+      // Cache & LRU
+      this.cache = new Map(); // key: prefix -> { names, ts }
+      this.cacheOrder = [];
+      this.maxCache = 20;
 
-  // Keyboard state
-  this.focusIndex = -1;
+      // Keyboard state
+      this.focusIndex = -1;
 
       this.init();
     }
@@ -681,19 +777,17 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
       // Chip Click Binding (Initial)
       this.bindChipListeners();
 
-  // Tabs
-  this.tabAll?.addEventListener("click", () => this.switchView("all"));
-  this.tabFav?.addEventListener("click", () => this.switchView("favorites"));
-  this.tabRecent?.addEventListener("click", () => this.switchView("recent"));
+      // Tabs
+      this.tabAll?.addEventListener("click", () => this.switchView("all"));
+      this.tabFav?.addEventListener("click", () =>
+        this.switchView("favorites")
+      );
+      this.tabRecent?.addEventListener("click", () =>
+        this.switchView("recent")
+      );
 
-  // Export
-  this.exportBtn?.addEventListener("click", () => this.exportSelection());
-
-  // Theme toggle
-  this.themeToggle?.addEventListener("click", () => this.toggleTheme());
-
-  // Keyboard navigation
-  window.addEventListener("keydown", (e) => this.handleKey(e));
+      // Keyboard navigation
+      window.addEventListener("keydown", (e) => this.handleKey(e));
 
       // 2. Initialize Selection
       // If server rendered an active state, add it to set
@@ -738,8 +832,9 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     }
 
     scrollTop(amount) {
-    if (this.topTrack) this.topTrack.scrollBy({ left: amount, behavior: 'smooth' });
-  }
+      if (this.topTrack)
+        this.topTrack.scrollBy({ left: amount, behavior: "smooth" });
+    }
 
     /* --- Collection Management --- */
 
@@ -849,7 +944,7 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
       }
     }
 
-  async fetchDataForSelection() {
+    async fetchDataForSelection() {
       this.loader.classList.add("active");
       this.grid.innerHTML = "";
       this.countBadge.innerText = "...";
@@ -865,11 +960,11 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
         return;
       }
 
-  // Concurrency + LRU cache
-  const promises = prefixes.map((p) => this.fetchCollectionCached(p));
-  const fetchedArrays = await Promise.all(promises);
-  this.icons = fetchedArrays.flat();
-    this.computeStatsAndTop();
+      // Concurrency + LRU cache
+      const promises = prefixes.map((p) => this.fetchCollectionCached(p));
+      const fetchedArrays = await Promise.all(promises);
+      this.icons = fetchedArrays.flat();
+      this.computeStatsAndTop();
 
       // Re-apply search filter if exists
       this.applySearchFilter();
@@ -877,43 +972,45 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     }
 
     computeStatsAndTop() {
-    // Stats: counts per selected collection
-    if (this.statsEl) {
-      const counts = {};
-      for (const it of this.icons) {
-        counts[it.pfx] = (counts[it.pfx] || 0) + 1;
+      // Stats: counts per selected collection
+      if (this.statsEl) {
+        const counts = {};
+        for (const it of this.icons) {
+          counts[it.pfx] = (counts[it.pfx] || 0) + 1;
+        }
+        const frag = document.createDocumentFragment();
+        Object.keys(counts)
+          .sort()
+          .forEach((p) => {
+            const chip = document.createElement("span");
+            chip.className = "stat-chip";
+            chip.textContent = `${p}: ${counts[p]} icons`;
+            frag.appendChild(chip);
+          });
+        this.statsEl.innerHTML = "";
+        this.statsEl.appendChild(frag);
       }
-      const frag = document.createDocumentFragment();
-      Object.keys(counts).sort().forEach((p) => {
-        const chip = document.createElement('span');
-        chip.className = 'stat-chip';
-        chip.textContent = `${p}: ${counts[p]} icons`;
-        frag.appendChild(chip);
-      });
-      this.statsEl.innerHTML = '';
-      this.statsEl.appendChild(frag);
+      // Top icons: take first few per collection
+      if (this.topTrack) {
+        this.topTrack.innerHTML = "";
+        const byPfx = new Map();
+        for (const it of this.icons) {
+          const arr = byPfx.get(it.pfx) || [];
+          if (arr.length < 5) arr.push(it);
+          byPfx.set(it.pfx, arr);
+        }
+        const items = [];
+        for (const [pfx, arr] of byPfx.entries()) {
+          arr.forEach((it) => items.push(it));
+        }
+        items.slice(0, 30).forEach((it) => {
+          const div = document.createElement("div");
+          div.className = "top-item";
+          div.innerHTML = `<img src="https://api.iconify.design/${it.pfx}/${it.name}.svg" alt="${it.name}" /> <span>${it.pfx}:${it.name}</span>`;
+          this.topTrack.appendChild(div);
+        });
+      }
     }
-    // Top icons: take first few per collection
-    if (this.topTrack) {
-      this.topTrack.innerHTML = '';
-      const byPfx = new Map();
-      for (const it of this.icons) {
-        const arr = byPfx.get(it.pfx) || [];
-        if (arr.length < 5) arr.push(it);
-        byPfx.set(it.pfx, arr);
-      }
-      const items = [];
-      for (const [pfx, arr] of byPfx.entries()) {
-        arr.forEach((it) => items.push(it));
-      }
-      items.slice(0, 30).forEach((it) => {
-        const div = document.createElement('div');
-        div.className = 'top-item';
-        div.innerHTML = `<img src="https://api.iconify.design/${it.pfx}/${it.name}.svg" alt="${it.name}" /> <span>${it.pfx}:${it.name}</span>`;
-        this.topTrack.appendChild(div);
-      });
-    }
-  }
 
     async fetchCollectionCached(prefix) {
       // cache hit
@@ -924,7 +1021,9 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
       }
       // fetch
       try {
-        const res = await fetch(`https://api.iconify.design/collection?prefix=${prefix}`);
+        const res = await fetch(
+          `https://api.iconify.design/collection?prefix=${prefix}`
+        );
         if (!res.ok) throw new Error("network");
         const data = await res.json();
         let names = data.uncategorized || Object.keys(data.icons || {});
@@ -936,7 +1035,9 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
         return names.map((n) => ({ pfx: prefix, name: n }));
       } catch (e) {
         // offline fallback: try localStorage
-        const offline = JSON.parse(localStorage.getItem(`relaxicons:cache:${prefix}`) || "[]");
+        const offline = JSON.parse(
+          localStorage.getItem(`relaxicons:cache:${prefix}`) || "[]"
+        );
         if (offline.length) {
           this.putCache(prefix, offline);
           return offline.map((n) => ({ pfx: prefix, name: n }));
@@ -978,7 +1079,9 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
         const recentIds = new Set(this.recent.map((r) => r.id));
         base = base.filter((it) => recentIds.has(`${it.pfx}:${it.name}`));
       }
-      this.visibleIcons = !query ? base : base.filter((it) => it.name.includes(query));
+      this.visibleIcons = !query
+        ? base
+        : base.filter((it) => it.name.includes(query));
       this.updateGrid();
     }
 
@@ -995,7 +1098,7 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
       this.renderNextBatch();
     }
 
-  renderNextBatch() {
+    renderNextBatch() {
       const batch = this.visibleIcons.slice(
         this.renderCount,
         this.renderCount + this.BATCH_SIZE
@@ -1024,10 +1127,9 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
           />
           <span class="il-name" title="${entry.name}">${entry.name}</span>
           <div class="il-actions">
-            <button class="il-copy-cmd" aria-label="Copy CLI command">CMD</button>
-            <button class="il-copy-svg" aria-label="Copy raw SVG">SVG</button>
-            <button class="il-copy-data" aria-label="Copy data URL">DATA</button>
             <button class="il-fav" aria-label="Toggle favorite">★</button>
+            <button class="il-copy-data" aria-label="Copy data URL">URL</button>
+            <button class="il-copy-svg" aria-label="Copy raw SVG">SVG</button>
           </div>
         `;
 
@@ -1044,27 +1146,28 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
         });
 
         // Button actions
-        card.querySelector(".il-copy-cmd").addEventListener("click", (e) => {
-          e.stopPropagation();
-          copyCmd();
-        });
-        card.querySelector(".il-copy-svg").addEventListener("click", async (e) => {
-          e.stopPropagation();
-          const svg = await this.fetchSvg(entry.pfx, entry.name);
-          if (svg) {
-            await navigator.clipboard.writeText(svg);
-            this.announceCopy(`${fullName} SVG copied`);
-          }
-        });
-        card.querySelector(".il-copy-data").addEventListener("click", async (e) => {
-          e.stopPropagation();
-          const svg = await this.fetchSvg(entry.pfx, entry.name);
-          if (svg) {
-            const dataUrl = `data:image/svg+xml;base64,${btoa(svg)}`;
-            await navigator.clipboard.writeText(dataUrl);
-            this.announceCopy(`${fullName} data URL copied`);
-          }
-        });
+
+        card
+          .querySelector(".il-copy-svg")
+          .addEventListener("click", async (e) => {
+            e.stopPropagation();
+            const svg = await this.fetchSvg(entry.pfx, entry.name);
+            if (svg) {
+              await navigator.clipboard.writeText(svg);
+              this.announceCopy(`${fullName} SVG copied`);
+            }
+          });
+        card
+          .querySelector(".il-copy-data")
+          .addEventListener("click", async (e) => {
+            e.stopPropagation();
+            const svg = await this.fetchSvg(entry.pfx, entry.name);
+            if (svg) {
+              const dataUrl = `data:image/svg+xml;base64,${btoa(svg)}`;
+              await navigator.clipboard.writeText(dataUrl);
+              this.announceCopy(`${fullName} data URL copied`);
+            }
+          });
         const favBtn = card.querySelector(".il-fav");
         const id = fullName;
         this.updateFavButton(favBtn, id);
@@ -1094,7 +1197,10 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     toggleFavorite(id) {
       if (this.favorites.has(id)) this.favorites.delete(id);
       else this.favorites.add(id);
-      localStorage.setItem("relaxicons:favorites", JSON.stringify(Array.from(this.favorites)));
+      localStorage.setItem(
+        "relaxicons:favorites",
+        JSON.stringify(Array.from(this.favorites))
+      );
     }
 
     markRecent(id) {
@@ -1102,13 +1208,16 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
       // remove duplicates
       this.recent = this.recent.filter((r) => r.id !== id);
       this.recent.unshift({ id, ts: now });
-      if (this.recent.length > this.maxRecent) this.recent.length = this.maxRecent;
+      if (this.recent.length > this.maxRecent)
+        this.recent.length = this.maxRecent;
       localStorage.setItem("relaxicons:recent", JSON.stringify(this.recent));
     }
 
     async fetchSvg(pfx, name) {
       try {
-        const res = await fetch(`https://api.iconify.design/${pfx}/${name}.svg`);
+        const res = await fetch(
+          `https://api.iconify.design/${pfx}/${name}.svg`
+        );
         if (!res.ok) return null;
         return await res.text();
       } catch {
@@ -1116,33 +1225,24 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
       }
     }
 
-    exportSelection() {
-      const selected = Array.from(this.selected).sort();
-      const json = JSON.stringify({ collections: selected }, null, 2);
-      const reactSnippet = selected
-        .map((p) => `import ${p}Icons from '@iconify-json/${p}';`)
-        .join('\n');
-      const content = `// Collections\n${json}\n\n// React imports\n${reactSnippet}\n`;
-      navigator.clipboard.writeText(content);
-      this.announceCopy("Selection exported to clipboard");
-    }
-
     announceCopy(msg) {
-      if (this.copyAria) this.copyAria.textContent = msg;
-    }
+      const ariaEl = document.getElementById("il-copy-aria");
+      if (!ariaEl) return;
 
-    toggleTheme() {
-      const root = document.documentElement;
-      const current = root.getAttribute("data-theme") || "dark";
-      const next = current === "dark" ? "light" : "dark";
-      root.setAttribute("data-theme", next);
-    }
+      // 1. Clear the text first
+      ariaEl.textContent = "";
 
+      // 2. Set the text after a tiny delay (10-50ms)
+      // This forces the screen reader to notice a "change" occurred
+      setTimeout(() => {
+        ariaEl.textContent = msg;
+      }, 50);
+    }
     handleKey(e) {
-      const cards = Array.from(this.grid.querySelectorAll('.il-card'));
+      const cards = Array.from(this.grid.querySelectorAll(".il-card"));
       const cols = this.computeCols();
       if (!cards.length) return;
-      if (["ArrowRight","ArrowLeft","ArrowDown","ArrowUp"].includes(e.key)) {
+      if (["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) {
         e.preventDefault();
       }
       switch (e.key) {
@@ -1173,8 +1273,10 @@ const { collections = [], defaultCollection = "lucide" } = Astro.props;
     computeCols() {
       // approximate columns based on card width
       const grid = this.grid.getBoundingClientRect();
-      const sample = this.grid.querySelector('.il-card');
-      const cardWidth = sample ? sample.getBoundingClientRect().width + 16 /* gap */ : 120;
+      const sample = this.grid.querySelector(".il-card");
+      const cardWidth = sample
+        ? sample.getBoundingClientRect().width + 16 /* gap */
+        : 120;
       return Math.max(1, Math.floor(grid.width / cardWidth));
     }
   }

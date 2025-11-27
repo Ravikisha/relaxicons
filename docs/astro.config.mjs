@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 
@@ -12,6 +13,12 @@ export default defineConfig({
       title: "Relaxicons",
       description:
         "CLI to fetch & transform Iconify icons into framework components.",
+      head: [
+        { tag: 'meta', attrs: { name: 'author', content: 'Relaxicons' } },
+      ],
+      components: {
+        Layout: './src/layouts/MainLayout.astro',
+      },
       logo: {
         src: "./logo.png",
         replacesTitle: true,
@@ -45,6 +52,7 @@ export default defineConfig({
           ],
         },
       ],
-    }),
+  }),
+  sitemap(),
   ],
 });

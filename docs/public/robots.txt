@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ravikisha.github.io/relaxicons/sitemap-index.xml

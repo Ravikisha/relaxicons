@@ -1,0 +1,42 @@
+---
+const { astro } = Astro as any;
+const url = new URL(astro.request.url);
+const canonical = url.href;
+const title = (astro.props && astro.props.title) || 'Relaxicons';
+const description = (astro.props && astro.props.description) || 'CLI to fetch & transform Iconify icons into framework components.';
+const base = import.meta.env.BASE_URL || '/relaxicons/';
+const image = new URL(`${base}logo.png`, url.origin).href;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="canonical" href={canonical} />
+		<meta name="description" content={description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={image} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={image} />
+		<script type="application/ld+json" set:html={JSON.stringify({
+			'@context': 'https://schema.org',
+			'@type': 'SoftwareApplication',
+			name: 'Relaxicons',
+			applicationCategory: 'DeveloperApplication',
+			operatingSystem: 'Cross-platform',
+			url: canonical,
+			image,
+			description,
+			offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
+		})} />
+		<slot name="head" />
+	</head>
+	<body>
+		<slot />
+	</body>
+	</html>
