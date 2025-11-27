@@ -1,6 +1,6 @@
 {
   "name": "relaxicons",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Relaxicons CLI: fetch Iconify icons and instantly generate themed React, Vue, Angular, and Laravel components with auto barrel exports and SVG normalization.",
   "main": "bin/index.js",
   "scripts": {
